@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String @id @default(cuid())
+  email        String @unique
+  username     String @unique
+  passwordHash String
+  role         Role   @default(USER)
+
+  items  Item[]  @relation("UserItems")
+  orders Order[] @relation("UserOrders")
+  sales  Order[] @relation("UserSales")
+  balance   Int      @default(1000)
+
+  ownedItems Item[] @relation("ItemOwner") // 🔹 добавляем это
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model Item {
+  id          String     @id @default(cuid())
+  title       String
+  description String
+  price       Decimal    @db.Decimal(10, 2)
+  status      ItemStatus @default(LISTED)
+
+  seller   User   @relation("UserItems", fields: [sellerId], references: [id])
+  sellerId String
+
+  owner   User?   @relation("ItemOwner", fields: [ownerId], references: [id]) // 🔹 добавляем имя связи
+  ownerId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+}
+
+enum ItemStatus {
+  LISTED
+  SOLD
+}
+
+model Order {
+  id        String   @id @default(cuid())
+  item      Item     @relation(fields: [itemId], references: [id])
+  itemId    String   @unique
+  buyer     User     @relation(fields: [buyerId], references: [id], name: "UserOrders")
+  buyerId   String
+  seller    User     @relation(fields: [sellerId], references: [id], name: "UserSales")
+  sellerId  String
+  price     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+}
