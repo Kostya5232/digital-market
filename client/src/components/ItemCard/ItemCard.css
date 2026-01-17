@@ -1,0 +1,110 @@
+/* Item card */
+.itemcard {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+    transition: transform 120ms ease, border-color 120ms ease, background 120ms ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.itemcard:hover {
+    transform: translateY(-2px);
+    border-color: rgba(108, 140, 255, 0.35);
+    background: rgba(108, 140, 255, 0.06);
+}
+
+.itemcard__media {
+    height: 170px;
+    background: rgba(0, 0, 0, 0.25);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.itemcard__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.itemcard__placeholder {
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.itemcard__body {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.itemcard__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.itemcard__title {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.itemcard__price {
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.itemcard__desc {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.35;
+
+    overflow: hidden;
+
+    line-clamp: 2;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.itemcard__cta {
+    margin-top: 6px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Skeleton */
+.card-skeleton {
+    height: 290px;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    background: rgba(255, 255, 255, 0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-40%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    animation: shimmer 1.2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-60%);
+    }
+    100% {
+        transform: translateX(60%);
+    }
+}

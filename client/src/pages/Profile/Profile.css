@@ -1,0 +1,110 @@
+/* Основной контейнер */
+.profile {
+    min-height: calc(100vh - 64px); /* шапка */
+    display: grid;
+    place-items: center;
+    padding: 32px 0;
+}
+
+/* Карточка с данными профиля */
+.profileCard {
+    width: 100%;
+    max-width: 440px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: rgba(255, 255, 255, 0.03);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+/* Заголовки */
+.profileTitle {
+    margin: 0;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+.profileInfo p {
+    font-size: 14px;
+    margin: 0;
+    color: var(--color-text-muted);
+}
+
+.profileInfo strong {
+    font-weight: 700;
+    color: var(--color-text);
+}
+
+/* Разделы */
+.profileSection {
+    margin-top: var(--space-6);
+}
+
+.sectionTitle {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+.orderList,
+.saleList {
+    list-style-type: none;
+    padding: 0;
+}
+
+.orderItem,
+.saleItem {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-lg);
+    margin: 6px 0;
+    padding: 12px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.orderItem:hover,
+.saleItem:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Состояние загрузки */
+.loading {
+    text-align: center;
+    font-size: 16px;
+    color: var(--color-text-muted);
+}
+
+/* Ошибка */
+.alert {
+    padding: 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+    color: red;
+}
+
+/* Кнопка редактирования */
+button {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    background-color: var(--color-primary);
+    color: white;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: var(--color-primary-hover);
+}
+
+button:disabled {
+    background-color: rgba(0, 0, 0, 0.2);
+    cursor: not-allowed;
+}

@@ -11,5 +11,5 @@
         "resolveJsonModule": true,
         "typeRoots": ["./src/types", "./node_modules/@types"]
     },
-    "include": ["src/**/*.ts", "prisma/**/*.ts"]
+    "include": ["src/**/*.ts"]
 }

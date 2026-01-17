@@ -19,7 +19,7 @@ model User {
   sales  Order[] @relation("UserSales")
   balance   Int      @default(1000)
 
-  ownedItems Item[] @relation("ItemOwner") // 🔹 добавляем это
+  ownedItems Item[] @relation("ItemOwner")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

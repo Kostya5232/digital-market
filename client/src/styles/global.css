@@ -1,0 +1,82 @@
+/* LootHub-inspired Foundation Styles */
+
+:root {
+    /* Colors */
+    --color-bg: #0b0f1a;
+    --color-surface: #12182b;
+    --color-card: #161d36;
+    --color-border: #242b4a;
+
+    --color-primary: #6c8cff;
+    --color-primary-hover: #5a7cff;
+    --color-accent: #22d3ee;
+
+    --color-text: #e6e9f2;
+    --color-text-muted: #9aa3c7;
+    --color-danger: #ef4444;
+    --color-success: #22c55e;
+
+    /* Typography */
+    --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+
+    /* Spacing */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: radial-gradient(1200px 600px at 50% -10%, #1a2250 0%, var(--color-bg) 60%);
+    color: var(--color-text);
+    line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+}
+
+p {
+    margin: 0;
+    color: var(--color-text-muted);
+}
+
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-primary-hover);
+}
+
+button {
+    font-family: inherit;
+}

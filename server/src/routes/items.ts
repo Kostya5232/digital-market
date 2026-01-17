@@ -9,7 +9,7 @@ const router = Router();
 const createSchema = z.object({
     title: z.string().min(2).max(120),
     description: z.string().min(1).max(2000),
-    price: z.number().positive().max(1000000), // цена в валюте, до 1 млн
+    price: z.number().positive().max(1000000),
 });
 
 const updateSchema = z.object({

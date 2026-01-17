@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma";
 import { requireAuth } from "../middleware/auth";
+import { Prisma } from "@prisma/client";
 
 const router = Router();
 
@@ -15,7 +16,9 @@ router.post("/purchase/:itemId", requireAuth, async (req, res, next) => {
         const buyer = await prisma.user.findUnique({ where: { id: req.user!.id } });
         if (!buyer) return res.status(404).json({ message: "User not found" });
 
-        if (buyer.balance < item.price) {
+        const price = item.price instanceof Prisma.Decimal ? item.price.toNumber() : Number(item.price);
+
+        if (buyer.balance < price) {
             return res.status(400).json({ message: "Not enough balance" });
         }
 
@@ -23,12 +26,12 @@ router.post("/purchase/:itemId", requireAuth, async (req, res, next) => {
             // Списываем деньги у покупателя, зачисляем продавцу
             await tx.user.update({
                 where: { id: buyer.id },
-                data: { balance: { decrement: item.price } },
+                data: { balance: { decrement: price } },
             });
 
             await tx.user.update({
                 where: { id: item.sellerId },
-                data: { balance: { increment: item.price } },
+                data: { balance: { increment: price } },
             });
 
             // Обновляем товар на SOLD
@@ -43,7 +46,7 @@ router.post("/purchase/:itemId", requireAuth, async (req, res, next) => {
                     itemId: updatedItem.id,
                     buyerId: buyer.id,
                     sellerId: item.sellerId,
-                    price: updatedItem.price,
+                    price: price,
                 },
             });
 

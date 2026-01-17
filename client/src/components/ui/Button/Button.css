@@ -1,0 +1,75 @@
+/* LootHub-inspired Button styles */
+
+.ui-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+
+    font-weight: 500;
+    line-height: 1;
+    transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+}
+
+/* Sizes */
+.ui-button--sm {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+
+.ui-button--md {
+    height: 40px;
+    padding: 0 16px;
+    font-size: 14px;
+}
+
+.ui-button--lg {
+    height: 48px;
+    padding: 0 20px;
+    font-size: 15px;
+}
+
+/* Variants */
+.ui-button--primary {
+    background: linear-gradient(180deg, #6c8cff, #5a7cff);
+    color: #ffffff;
+    box-shadow: 0 4px 20px rgba(108, 140, 255, 0.35);
+}
+
+.ui-button--primary:hover {
+    box-shadow: 0 6px 28px rgba(108, 140, 255, 0.5);
+    transform: translateY(-1px);
+}
+
+.ui-button--secondary {
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+}
+
+.ui-button--secondary:hover {
+    background: var(--color-card);
+}
+
+.ui-button--ghost {
+    background: transparent;
+    color: var(--color-text-muted);
+}
+
+.ui-button--ghost:hover {
+    color: var(--color-text);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+/* States */
+.ui-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}

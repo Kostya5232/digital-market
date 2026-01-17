@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getMe } from "../api/auth";
 
-type User = { id: string; email: string; username: string } | null;
+type User = { id: string; email: string; username: string; balance: number; role?: "USER" | "ADMIN" } | null;
 
 interface AuthContextType {
     user: User;
@@ -13,15 +13,34 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+    const [token, setToken] = useState<string | null>(() => localStorage.getItem("token"));
     const [user, setUser] = useState<User>(null);
-    const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
 
     useEffect(() => {
-        if (token) {
-            getMe(token)
-                .then((data) => setUser(data.user))
-                .catch(() => logout());
+        let cancelled = false;
+
+        async function loadMe() {
+            if (!token) {
+                setUser(null);
+                return;
+            }
+            try {
+                const me = await getMe(token);
+                if (!cancelled) setUser(me);
+            } catch (e) {
+                console.warn("getMe failed, dropping token", e);
+                localStorage.removeItem("token");
+                if (!cancelled) {
+                    setToken(null);
+                    setUser(null);
+                }
+            }
         }
+
+        loadMe();
+        return () => {
+            cancelled = true;
+        };
     }, [token]);
 
     const login = (newToken: string) => {
