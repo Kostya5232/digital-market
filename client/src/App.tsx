@@ -7,6 +7,7 @@ import Profile from "./pages/Profile/Profile";
 import AddItem from "./pages/AddItem/AddItem";
 import ItemDetail from "./pages/ItemDetail/ItemDetail";
 import Navbar from "./components/ui/Navbar/Navbar";
+import EditItem from "./pages/EditItem/EditItem";
 
 export default function App() {
     return (
@@ -23,6 +24,7 @@ export default function App() {
                                 <Route path="/profile" element={<Profile />} />
                                 <Route path="/add-item" element={<AddItem />} />
                                 <Route path="/items/:id" element={<ItemDetail />} />
+                                <Route path="/items/:id/edit" element={<EditItem />} />
                             </Routes>
                         </div>
                     </main>

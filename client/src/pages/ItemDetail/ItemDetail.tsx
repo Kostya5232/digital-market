@@ -2,17 +2,19 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Button from "../../components/ui/Button/Button";
 import { useAuth } from "../../context/AuthContext";
-import { fetchItem, buyItem } from "../../services/api";
+import { fetchItem, buyItem, API_URL } from "../../services/api";
 
 import "./ItemDetail.css";
 
 type Item = {
-    id: number;
+    id: string;
     title: string;
     description?: string;
     price: number;
-    image_url?: string | null;
-    owner_id?: number;
+    hasImage?: boolean;
+    updatedAt?: string;
+    ownerId?: string | null;
+    sellerId?: string;
 };
 
 function formatPrice(value: number) {
@@ -57,7 +59,8 @@ export default function ItemDetail() {
         };
     }, [id]);
 
-    const isOwner = Boolean(user && item && item.owner_id != null && Number(user.id) === item.owner_id);
+    const isOwner = Boolean(user && item && item.ownerId && user.id === item.ownerId);
+    const isSeller = Boolean(user && item && item.sellerId && user.id === item.sellerId);
 
     async function handleBuy() {
         if (!item) return;
@@ -102,15 +105,17 @@ export default function ItemDetail() {
             </div>
         );
     }
+    const imgSrc =
+        item.hasImage && item.updatedAt
+            ? `${API_URL}/items/${item.id}/image?v=${encodeURIComponent(item.updatedAt)}`
+            : item.hasImage
+            ? `${API_URL}/items/${item.id}/image`
+            : null;
 
     return (
         <div className="product">
             <div className="product__media">
-                {item.image_url ? (
-                    <img className="product__img" src={item.image_url} alt={item.title} />
-                ) : (
-                    <div className="product__placeholder">No image</div>
-                )}
+                {imgSrc ? <img className="product__img" src={imgSrc} alt={item.title} /> : <div className="product__placeholder">No image</div>}
             </div>
 
             <div className="product__info">
@@ -136,6 +141,16 @@ export default function ItemDetail() {
                     <Link to="/">
                         <Button variant="secondary">Назад</Button>
                     </Link>
+
+                    {isSeller ? (
+                        <Link to={`/items/${item.id}/edit`}>
+                            <Button variant="secondary">Редактировать</Button>
+                        </Link>
+                    ) : (
+                        <Button onClick={handleBuy} disabled={buying}>
+                            ...
+                        </Button>
+                    )}
 
                     {isOwner ? (
                         <Button variant="ghost" disabled>

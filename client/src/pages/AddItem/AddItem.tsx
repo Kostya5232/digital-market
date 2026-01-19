@@ -12,25 +12,20 @@ export default function AddItem() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState<number>(0);
-    const [imageUrl, setImageUrl] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+    const [imageFile, setImageFile] = useState<File | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!token) {
-            setError("Вы должны войти в аккаунт");
-            return;
-        }
+        setError("");
 
-        if (!title || !description || price <= 0) {
-            setError("Заполните все поля правильно");
-            return;
-        }
+        if (!token) return setError("Вы должны войти в аккаунт");
+        if (!title.trim() || !description.trim() || price <= 0) return setError("Заполните все поля правильно");
 
         try {
             setLoading(true);
-            await createItem(token, title, description, price, imageUrl || undefined);
+            await createItem(token, title.trim(), description.trim(), price, imageFile);
             navigate("/");
         } catch {
             setError("Ошибка при добавлении товара");
@@ -82,13 +77,12 @@ export default function AddItem() {
                     </div>
 
                     <div className="field">
-                        <label className="label">URL изображения (опционально)</label>
+                        <label className="label">Изображение (jpg/png/webp)</label>
                         <input
-                            type="text"
-                            placeholder="Введите URL изображения"
-                            value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
                             className="input"
+                            type="file"
+                            accept="image/jpeg,image/png,image/webp"
+                            onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
                         />
                     </div>
 

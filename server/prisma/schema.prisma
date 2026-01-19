@@ -37,6 +37,9 @@ model Item {
   price       Decimal    @db.Decimal(10, 2)
   status      ItemStatus @default(LISTED)
 
+  imageData   Bytes?
+  imageMime   String?
+
   seller   User   @relation("UserItems", fields: [sellerId], references: [id])
   sellerId String
 

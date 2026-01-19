@@ -1,26 +1,34 @@
 import { Link } from "react-router-dom";
 import Button from "../ui/Button/Button";
 import "./ItemCard.css";
+import { API_URL } from "../../api/auth";
 
 type Item = {
-    id: number;
+    id: string;
     title: string;
     description?: string;
     price: number;
-    image_url?: string | null;
+    hasImage?: boolean;
+    updatedAt?: string;
 };
 
 function formatPrice(value: number) {
-    // если у тебя рубли — можешь заменить на "RUB"
     return new Intl.NumberFormat("ru-RU", { style: "currency", currency: "RUB" }).format(value);
 }
 
 export default function ItemCard({ item }: { item: Item }) {
+    const imgSrc =
+        item.hasImage && item.updatedAt
+            ? `${API_URL}/items/${item.id}/image?v=${encodeURIComponent(item.updatedAt)}`
+            : item.hasImage
+            ? `${API_URL}/items/${item.id}/image`
+            : null;
+
     return (
         <Link to={`/items/${item.id}`} className="itemcard">
             <div className="itemcard__media">
-                {item.image_url ? (
-                    <img className="itemcard__img" src={item.image_url} alt={item.title} loading="lazy" />
+                {imgSrc ? (
+                    <img className="itemcard__img" src={imgSrc} alt={item.title} loading="lazy" />
                 ) : (
                     <div className="itemcard__placeholder">No image</div>
                 )}

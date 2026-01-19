@@ -73,3 +73,13 @@
     transform: none;
     box-shadow: none;
 }
+
+.btn--danger {
+    background: rgba(255, 70, 70, 0.16);
+    border: 1px solid rgba(255, 70, 70, 0.35);
+}
+
+.btn--danger:hover {
+    background: rgba(255, 70, 70, 0.24);
+    border-color: rgba(255, 70, 70, 0.55);
+}
