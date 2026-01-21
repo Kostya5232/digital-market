@@ -82,4 +82,29 @@ router.get("/me", requireAuth, async (req, res, next) => {
     }
 });
 
+const updateMeSchema = z.object({
+    username: z.string().min(3).max(30),
+});
+
+router.patch("/me", requireAuth, async (req, res, next) => {
+    try {
+        const { username } = updateMeSchema.parse(req.body);
+
+        const exists = await prisma.user.findUnique({ where: { username } });
+        if (exists && exists.id !== req.user!.id) {
+            return res.status(409).json({ message: "Username уже используется" });
+        }
+
+        const updated = await prisma.user.update({
+            where: { id: req.user!.id },
+            data: { username },
+            select: { id: true, email: true, username: true, role: true, balance: true },
+        });
+
+        res.json(updated);
+    } catch (err) {
+        next(err);
+    }
+});
+
 export default router;

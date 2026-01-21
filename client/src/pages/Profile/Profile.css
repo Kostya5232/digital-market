@@ -1,12 +1,10 @@
-/* Основной контейнер */
 .profile {
-    min-height: calc(100vh - 64px); /* шапка */
+    min-height: calc(100vh - 64px);
     display: grid;
     place-items: center;
     padding: 32px 0;
 }
 
-/* Карточка с данными профиля */
 .profileCard {
     width: 100%;
     max-width: 440px;
@@ -19,7 +17,6 @@
     gap: var(--space-6);
 }
 
-/* Заголовки */
 .profileTitle {
     margin: 0;
     font-size: 26px;
@@ -38,7 +35,6 @@
     color: var(--color-text);
 }
 
-/* Разделы */
 .profileSection {
     margin-top: var(--space-6);
 }
@@ -72,14 +68,12 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
-/* Состояние загрузки */
 .loading {
     text-align: center;
     font-size: 16px;
     color: var(--color-text-muted);
 }
 
-/* Ошибка */
 .alert {
     padding: 12px;
     border-radius: var(--radius-lg);
@@ -88,32 +82,11 @@
     font-size: 13px;
     color: red;
 }
-/* 
-button {
-    padding: 10px 16px;
-    font-size: 14px;
-    border-radius: var(--radius-md);
-    border: none;
-    background-color: var(--color-primary);
-    color: white;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: var(--color-primary-hover);
-}
-
-button:disabled {
-    background-color: rgba(0, 0, 0, 0.2);
-    cursor: not-allowed;
-}
-*/
 
 .profileCard {
-    max-width: 820px; /* было 440 */
+    max-width: 820px;
 }
 
-/* заголовок секции + кнопка справа */
 .sectionHead {
     display: flex;
     align-items: center;
@@ -121,7 +94,6 @@ button:disabled {
     gap: 12px;
 }
 
-/* мои товары */
 .myItemList {
     list-style: none;
     padding: 0;
@@ -192,4 +164,104 @@ button:disabled {
     gap: 10px;
     flex-wrap: wrap;
     justify-content: flex-end;
+}
+
+.profileCard--wide {
+    max-width: 920px;
+}
+
+.profileHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.profileTabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.tabBtn {
+    border: 1px solid var(--color-border);
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--color-text);
+    padding: 8px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.tabBtn--active {
+    border-color: rgba(108, 140, 255, 0.55);
+    box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.14);
+}
+
+.settingsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 10px;
+}
+
+.settingsBlock {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: rgba(0, 0, 0, 0.14);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.settingsBlock--full {
+    grid-column: 1 / -1;
+}
+
+.settingsLabel {
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.select {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--color-text);
+    outline: none;
+}
+
+.settingsActions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.mutedSmall {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.dangerBtn {
+    background: rgba(255, 70, 70, 0.16) !important;
+    border: 1px solid rgba(255, 70, 70, 0.35) !important;
+}
+.dangerBtn:hover {
+    background: rgba(255, 70, 70, 0.24) !important;
+    border-color: rgba(255, 70, 70, 0.55) !important;
+}
+
+@media (max-width: 760px) {
+    .profileHeader {
+        flex-direction: column;
+    }
+    .settingsGrid {
+        grid-template-columns: 1fr;
+    }
 }

@@ -37,6 +37,8 @@ model Item {
   price       Decimal    @db.Decimal(10, 2)
   status      ItemStatus @default(LISTED)
 
+  category    ItemCategory @default(OTHER)
+
   imageData   Bytes?
   imageMime   String?
 
@@ -49,6 +51,16 @@ model Item {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   orders    Order[]
+}
+
+enum ItemCategory {
+  ACCOUNTS
+  KEYS
+  SUBSCRIPTIONS
+  SERVICES
+  GAME_CURRENCIES
+  NFT_TOKENS
+  OTHER
 }
 
 enum ItemStatus {

@@ -7,6 +7,9 @@ import { API_URL, fetchItem } from "../../services/api";
 
 import { updateItem } from "../../api/items";
 
+import { CATEGORIES, ItemCategory, categoryLabel } from "../../lib/categories";
+import { useSettings } from "../../context/SettingsContext";
+
 import "./EditItem.css";
 
 type Item = {
@@ -15,7 +18,9 @@ type Item = {
     description?: string;
     price: number;
 
-    sellerId?: string; // кто выложил
+    category: ItemCategory;
+
+    sellerId?: string; 
     ownerId?: string | null;
 
     hasImage?: boolean;
@@ -30,34 +35,31 @@ export default function EditItem() {
     const { id } = useParams();
     const navigate = useNavigate();
     const { user, token } = useAuth();
+    const { lang } = useSettings();
 
     const [item, setItem] = useState<Item | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // поля формы
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState<number>(0);
+    const [category, setCategory] = useState<ItemCategory>("OTHER");
 
-    // картинка
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
     const [removeImage, setRemoveImage] = useState(false);
 
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // текущая картинка товара (если есть)
     const currentImgSrc = useMemo(() => {
         if (!item?.hasImage) return null;
 
-        // версия, чтобы не ловить кэш
         if (item.updatedAt) {
             return `${API_URL}/items/${item.id}/image?v=${encodeURIComponent(item.updatedAt)}`;
         }
         return `${API_URL}/items/${item.id}/image`;
     }, [item]);
 
-    // превью выбранного файла
     const newImgPreview = useMemo(() => {
         if (!newImageFile) return null;
         return URL.createObjectURL(newImageFile);
@@ -84,12 +86,13 @@ export default function EditItem() {
 
                 const data = await fetchItem(id);
 
-                // приведение к нашему виду
                 const normalized: Item = {
                     id: String(data.id),
                     title: data.title,
                     description: data.description,
                     price: Number(data.price),
+
+                    category: (data.category ?? "OTHER") as ItemCategory,
 
                     sellerId: data.sellerId ?? data.seller_id,
                     ownerId: data.ownerId ?? data.owner_id,
@@ -103,6 +106,7 @@ export default function EditItem() {
                     setTitle(normalized.title ?? "");
                     setDescription(normalized.description ?? "");
                     setPrice(Number.isFinite(normalized.price) ? normalized.price : 0);
+                    setCategory(normalized.category);
                 }
             } catch (e: any) {
                 if (!cancelled) setError("Не удалось загрузить товар.");
@@ -156,14 +160,21 @@ export default function EditItem() {
         try {
             setSaving(true);
 
-            const updated = await updateItem(token, item.id, { title: cleanTitle, description: cleanDescription, price }, newImageFile, removeImage);
+            const updated = await updateItem(
+                token,
+                item.id,
+                { title: cleanTitle, description: cleanDescription, price, category },
+                newImageFile,
+                removeImage
+            );
 
-            // обновим локальный item (для обновления превью и v=updatedAt)
             const next: Item = {
                 id: String(updated.id),
                 title: updated.title,
                 description: updated.description,
                 price: Number(updated.price),
+
+                category: (updated.category ?? "OTHER") as ItemCategory,
 
                 sellerId: updated.sellerId ?? updated.seller_id,
                 ownerId: updated.ownerId ?? updated.owner_id,
@@ -173,10 +184,10 @@ export default function EditItem() {
             };
 
             setItem(next);
+            setCategory(next.category);
             setNewImageFile(null);
             setRemoveImage(false);
 
-            // можно сразу возвращать на карточку товара
             navigate(`/items/${next.id}`);
         } catch (e: any) {
             setError("Ошибка при сохранении. Проверь поля и попробуй снова.");
@@ -244,6 +255,17 @@ export default function EditItem() {
                 {error && <div className="editAlert">{error}</div>}
 
                 <form className="editForm" onSubmit={onSave}>
+                    <div className="field">
+                        <label className="label">{lang === "ru" ? "Категория" : "Category"}</label>
+                        <select className="input" value={category} onChange={(e) => setCategory(e.target.value as any)}>
+                            {CATEGORIES.map((c) => (
+                                <option key={c} value={c}>
+                                    {categoryLabel(c, lang)}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
                     <div className="field">
                         <label className="label">Название</label>
                         <input className="input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Название товара" required />

@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button/Button";
 import { useAuth } from "../../context/AuthContext";
-import { login } from "../../api/auth"; // Используем login из api/auth
+import { login } from "../../api/auth";
 import "./Login.css";
 
 export default function Login() {
@@ -25,10 +25,8 @@ export default function Login() {
 
         try {
             setLoading(true);
-            // Получаем данные пользователя (включая токен)
             const data = await login(username.trim(), password);
-            // Передаем токен в контекст для дальнейшего использования
-            authLogin(data.token); // Вызываем login из контекста
+            authLogin(data.token);
             navigate("/");
         } catch (err: any) {
             setError("Неверный логин или пароль.");

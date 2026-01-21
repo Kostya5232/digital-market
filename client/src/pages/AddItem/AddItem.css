@@ -1,12 +1,10 @@
-/* Главный контейнер страницы */
 .addItemPage {
-    min-height: calc(100vh - 64px); /* шапка */
+    min-height: calc(100vh - 64px);
     display: grid;
     place-items: center;
     padding: 32px 0;
 }
 
-/* Карточка с формой */
 .addItemCard {
     width: 100%;
     max-width: 440px;
@@ -16,7 +14,6 @@
     padding: 22px;
 }
 
-/* Заголовок */
 .addItemTitle {
     margin: 0;
     font-size: 26px;
@@ -24,7 +21,6 @@
     line-height: 1.15;
 }
 
-/* Ошибка */
 .alert {
     padding: 12px;
     border-radius: var(--radius-lg);
@@ -34,7 +30,6 @@
     margin-bottom: 20px;
 }
 
-/* Форма */
 .addItemForm {
     display: flex;
     flex-direction: column;
@@ -72,18 +67,15 @@
     color: rgba(231, 236, 255, 0.45);
 }
 
-/* Кнопка */
 .addItemButton {
     width: 100%;
     margin-top: 6px;
 }
 
-/* Лоадер */
 .addItemButton:disabled {
     background: rgba(0, 0, 0, 0.12);
 }
 
-/* Отступы */
 .field {
     margin-bottom: 18px;
 }

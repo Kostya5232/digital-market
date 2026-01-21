@@ -1,4 +1,3 @@
-/* Item card */
 .itemcard {
     display: flex;
     flex-direction: column;
@@ -51,6 +50,19 @@
     gap: var(--space-3);
 }
 
+.itemcard__badge {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    margin-top: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
 .itemcard__title {
     font-weight: 600;
     letter-spacing: -0.01em;
@@ -81,7 +93,6 @@
     justify-content: flex-end;
 }
 
-/* Skeleton */
 .card-skeleton {
     height: 290px;
     border-radius: var(--radius-xl);

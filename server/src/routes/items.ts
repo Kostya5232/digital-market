@@ -7,6 +7,10 @@ import multer from "multer";
 
 const router = Router();
 
+const CATEGORY_VALUES = ["ACCOUNTS", "KEYS", "SUBSCRIPTIONS", "SERVICES", "GAME_CURRENCIES", "NFT_TOKENS", "OTHER"] as const;
+
+const CategoryEnum = z.enum(CATEGORY_VALUES);
+
 const upload = multer({
     storage: multer.memoryStorage(),
     limits: { fileSize: 5 * 1024 * 1024 },
@@ -16,18 +20,21 @@ const createSchema = z.object({
     title: z.string().min(2).max(120),
     description: z.string().min(1).max(2000),
     price: z.number().positive().max(1000000),
+    category: CategoryEnum.optional(),
 });
 
 const updateSchema = z.object({
     title: z.string().min(2).max(120).optional(),
     description: z.string().min(1).max(2000).optional(),
     price: z.number().positive().max(1000000).optional(),
+    category: CategoryEnum.optional(),
 });
 
 const updateMultipartSchema = z.object({
     title: z.string().min(2).max(120).optional(),
     description: z.string().min(1).max(2000).optional(),
     price: z.string().optional(),
+    category: CategoryEnum.optional(),
     removeImage: z.enum(["true", "false"]).optional(),
 });
 
@@ -36,10 +43,17 @@ router.get("/", async (req, res, next) => {
     try {
         const status = (req.query.status as string) ?? "LISTED";
         const search = (req.query.search as string) ?? "";
+        const category = (req.query.category as string) ?? "";
+
+        const categoryFilter = category ? CategoryEnum.safeParse(category) : null;
+        if (category && !categoryFilter?.success) {
+            return res.status(400).json({ message: "Invalid category" });
+        }
 
         const items = await prisma.item.findMany({
             where: {
                 status: status === "ALL" ? undefined : (status as any),
+                category: categoryFilter?.success ? (categoryFilter.data as any) : undefined,
                 AND: search ? [{ title: { contains: search, mode: "insensitive" } }] : undefined,
             },
             orderBy: { createdAt: "desc" },
@@ -49,6 +63,7 @@ router.get("/", async (req, res, next) => {
                 description: true,
                 price: true,
                 status: true,
+                category: true,
                 imageMime: true,
                 seller: { select: { id: true, username: true } },
             },
@@ -76,6 +91,7 @@ router.get("/mine", requireAuth, async (req, res, next) => {
                 description: true,
                 price: true,
                 status: true,
+                category: true,
                 updatedAt: true,
                 imageMime: true,
             },
@@ -128,6 +144,7 @@ router.get("/:id", async (req, res, next) => {
                 description: true,
                 price: true,
                 status: true,
+                category: true,
                 sellerId: true,
                 ownerId: true,
                 createdAt: true,
@@ -150,15 +167,15 @@ router.get("/:id", async (req, res, next) => {
     }
 });
 
-// ✅ Создать новый товар (multipart/form-data + файл image)
+// Создать новый товар
 router.post("/", requireAuth, upload.single("image"), async (req, res, next) => {
     try {
-        // multipart -> всё строками
         const title = String(req.body.title ?? "");
         const description = String(req.body.description ?? "");
         const price = Number(req.body.price);
+        const category = String(req.body.category ?? "OTHER");
 
-        const data = createSchema.parse({ title, description, price });
+        const data = createSchema.parse({ title, description, price, category });
 
         const file = req.file;
 
@@ -177,6 +194,8 @@ router.post("/", requireAuth, upload.single("image"), async (req, res, next) => 
                 status: "LISTED",
                 sellerId: req.user!.id,
 
+                category: (data.category ?? "OTHER") as any,
+
                 imageData: file ? file.buffer : undefined,
                 imageMime: file ? file.mimetype : undefined,
             },
@@ -186,6 +205,7 @@ router.post("/", requireAuth, upload.single("image"), async (req, res, next) => 
                 description: true,
                 price: true,
                 status: true,
+                category: true,
                 sellerId: true,
                 ownerId: true,
                 createdAt: true,
@@ -203,7 +223,7 @@ router.post("/", requireAuth, upload.single("image"), async (req, res, next) => 
     }
 });
 
-// ✅ Обновить товар (JSON). Если хочешь менять картинку — сделаем отдельный endpoint.
+// Обновить товар
 router.put("/:id", requireAuth, async (req, res, next) => {
     try {
         const itemId = req.params.id;
@@ -225,6 +245,7 @@ router.put("/:id", requireAuth, async (req, res, next) => {
                 title: data.title ?? item.title,
                 description: data.description ?? item.description,
                 price: data.price != null ? new Prisma.Decimal(Number(data.price.toFixed(2))) : item.price,
+                category: (data.category as any) ?? undefined,
             },
             select: {
                 id: true,
@@ -232,6 +253,7 @@ router.put("/:id", requireAuth, async (req, res, next) => {
                 description: true,
                 price: true,
                 status: true,
+                category: true,
                 sellerId: true,
                 ownerId: true,
                 createdAt: true,
@@ -249,8 +271,6 @@ router.put("/:id", requireAuth, async (req, res, next) => {
     }
 });
 
-// ✅ Обновить товар + (опционально) заменить/удалить изображение (multipart/form-data)
-// Отправляй поля: title, description, price (строки) + image (файл) + removeImage=true
 router.patch("/:id", requireAuth, upload.single("image"), async (req, res, next) => {
     try {
         const itemId = req.params.id;
@@ -296,7 +316,8 @@ router.patch("/:id", requireAuth, upload.single("image"), async (req, res, next)
                 description: raw.description ?? item.description,
                 price: nextPrice != null ? new Prisma.Decimal(Number(nextPrice.toFixed(2))) : item.price,
 
-                // картинка
+                category: (raw.category as any) ?? undefined,
+
                 imageData: removeImage ? null : file ? file.buffer : undefined,
                 imageMime: removeImage ? null : file ? file.mimetype : undefined,
             },
@@ -306,6 +327,7 @@ router.patch("/:id", requireAuth, upload.single("image"), async (req, res, next)
                 description: true,
                 price: true,
                 status: true,
+                category: true,
                 sellerId: true,
                 ownerId: true,
                 createdAt: true,
@@ -320,7 +342,7 @@ router.patch("/:id", requireAuth, upload.single("image"), async (req, res, next)
     }
 });
 
-// ✅ Удалить товар
+// Удалить товар
 router.delete("/:id", requireAuth, async (req, res, next) => {
     try {
         const itemId = req.params.id;

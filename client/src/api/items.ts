@@ -1,7 +1,12 @@
 export const API_URL = "http://localhost:4000/api";
 
-export async function fetchItems() {
-    const res = await fetch(`${API_URL}/items`);
+export async function fetchItems(params?: { category?: string; search?: string }) {
+    const qs = new URLSearchParams();
+    if (params?.category) qs.set("category", params.category);
+    if (params?.search) qs.set("search", params.search);
+
+    const url = `${API_URL}/items${qs.toString() ? `?${qs.toString()}` : ""}`;
+    const res = await fetch(url);
     if (!res.ok) throw new Error("Ошибка при загрузке товаров");
     return res.json();
 }
@@ -12,11 +17,19 @@ export async function fetchItem(id: string) {
     return res.json();
 }
 
-export async function createItem(token: string, title: string, description: string, price: number, imageFile?: File | null) {
+export async function createItem(
+    token: string,
+    title: string,
+    description: string,
+    price: number,
+    category: string,
+    imageFile?: File | null
+) {
     const form = new FormData();
     form.append("title", title);
     form.append("description", description);
     form.append("price", String(price));
+    form.append("category", category);
 
     if (imageFile) form.append("image", imageFile);
 
@@ -35,7 +48,7 @@ export async function createItem(token: string, title: string, description: stri
 export async function updateItem(
     token: string,
     id: string,
-    data: { title?: string; description?: string; price?: number },
+    data: { title?: string; description?: string; price?: number; category?: string },
     imageFile?: File | null,
     removeImage?: boolean
 ) {
@@ -43,6 +56,7 @@ export async function updateItem(
     if (data.title != null) form.append("title", data.title);
     if (data.description != null) form.append("description", data.description);
     if (data.price != null) form.append("price", String(data.price));
+    if (data.category != null) form.append("category", data.category);
     if (removeImage != null) form.append("removeImage", removeImage ? "true" : "false");
     if (imageFile) form.append("image", imageFile);
 

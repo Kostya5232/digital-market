@@ -1,10 +1,12 @@
 import { Link, NavLink } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import Button from "../Button/Button";
+import { useSettings } from "../../../context/SettingsContext";
 import "./Navbar.css";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
+    const { t } = useSettings();
 
     return (
         <header className="topbar">
@@ -16,15 +18,17 @@ export default function Navbar() {
 
                     <nav className="nav">
                         <NavLink to="/" className={({ isActive }) => (isActive ? "navlink navlink--active" : "navlink")}>
-                            Главная
+                            {t("home")}
                         </NavLink>
+
                         {user && (
                             <>
                                 <NavLink to="/profile" className={({ isActive }) => (isActive ? "navlink navlink--active" : "navlink")}>
-                                    Профиль
+                                    {t("profileNav")}
                                 </NavLink>
+
                                 <NavLink to="/add-item" className={({ isActive }) => (isActive ? "navlink navlink--active" : "navlink")}>
-                                    Добавить товар
+                                    {t("addItem")}
                                 </NavLink>
                             </>
                         )}
@@ -34,18 +38,20 @@ export default function Navbar() {
                 <div className="topbar__right">
                     {user ? (
                         <>
-                            <span className="userchip">Привет, {user.username}</span>
+                            <span className="userchip">
+                                {t("hello")}, {user.username}
+                            </span>
                             <Button variant="ghost" onClick={logout}>
-                                Выйти
+                                {t("logout")}
                             </Button>
                         </>
                     ) : (
                         <div className="authlinks">
                             <NavLink to="/login" className={({ isActive }) => (isActive ? "navlink navlink--active" : "navlink")}>
-                                Вход
+                                {t("login")}
                             </NavLink>
                             <NavLink to="/register" className={({ isActive }) => (isActive ? "navlink navlink--active" : "navlink")}>
-                                Регистрация
+                                {t("register")}
                             </NavLink>
                         </div>
                     )}

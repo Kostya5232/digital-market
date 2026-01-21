@@ -3,15 +3,19 @@ import { useNavigate } from "react-router-dom";
 import Button from "../../components/ui/Button/Button";
 import { useAuth } from "../../context/AuthContext";
 import { createItem } from "../../api/items";
+import { CATEGORIES, ItemCategory, categoryLabel } from "../../lib/categories";
+import { useSettings } from "../../context/SettingsContext";
 import "./AddItem.css";
 
 export default function AddItem() {
     const { token } = useAuth();
     const navigate = useNavigate();
+    const { lang, t } = useSettings();
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState<number>(0);
+    const [category, setCategory] = useState<ItemCategory>(ItemCategory.OTHER);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [imageFile, setImageFile] = useState<File | null>(null);
@@ -25,7 +29,7 @@ export default function AddItem() {
 
         try {
             setLoading(true);
-            await createItem(token, title.trim(), description.trim(), price, imageFile);
+            await createItem(token, title.trim(), description.trim(), price, category, imageFile);
             navigate("/");
         } catch {
             setError("Ошибка при добавлении товара");
@@ -41,6 +45,16 @@ export default function AddItem() {
                 {error && <div className="alert">{error}</div>}
 
                 <form onSubmit={handleSubmit} className="addItemForm">
+                    <div className="field">
+                        <label className="label">{t("category")}</label>
+                        <select className="input" value={category} onChange={(e) => setCategory(e.target.value as ItemCategory)}>
+                            {CATEGORIES.map((c) => (
+                                <option key={c} value={c}>
+                                    {categoryLabel(c, lang)}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <div className="field">
                         <label className="label">Название товара</label>
                         <input

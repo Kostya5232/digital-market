@@ -8,6 +8,7 @@ interface AuthContextType {
     token: string | null;
     login: (token: string) => void;
     logout: () => void;
+    refreshMe: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -54,7 +55,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(null);
     };
 
-    return <AuthContext.Provider value={{ user, token, login, logout }}>{children}</AuthContext.Provider>;
+    const refreshMe = async () => {
+        if (!token) return;
+        const me = await getMe(token);
+        setUser(me);
+    };
+
+    return <AuthContext.Provider value={{ user, token, login, logout, refreshMe }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

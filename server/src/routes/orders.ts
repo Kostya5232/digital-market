@@ -23,7 +23,6 @@ router.post("/purchase/:itemId", requireAuth, async (req, res, next) => {
         }
 
         const order = await prisma.$transaction(async (tx) => {
-            // Списываем деньги у покупателя, зачисляем продавцу
             await tx.user.update({
                 where: { id: buyer.id },
                 data: { balance: { decrement: price } },
@@ -34,13 +33,11 @@ router.post("/purchase/:itemId", requireAuth, async (req, res, next) => {
                 data: { balance: { increment: price } },
             });
 
-            // Обновляем товар на SOLD
             const updatedItem = await tx.item.update({
                 where: { id: item.id },
                 data: { status: "SOLD", ownerId: buyer.id },
             });
 
-            // Создаём заказ
             const createdOrder = await tx.order.create({
                 data: {
                     itemId: updatedItem.id,

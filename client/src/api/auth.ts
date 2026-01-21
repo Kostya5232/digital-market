@@ -27,3 +27,16 @@ export async function getMe(token: string) {
     if (!res.ok) throw new Error("Ошибка получения данных пользователя");
     return res.json();
 }
+
+export async function updateMe(token: string, username: string) {
+    const res = await fetch(`${API_URL}/auth/me`, {
+        method: "PATCH",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ username }),
+    });
+    if (!res.ok) throw new Error("Ошибка обновления профиля");
+    return res.json();
+}

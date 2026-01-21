@@ -1,5 +1,5 @@
 .auth {
-    min-height: calc(100vh - 64px); /* шапка */
+    min-height: calc(100vh - 64px);
     display: grid;
     place-items: center;
     padding: 32px 0;
