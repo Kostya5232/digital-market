@@ -1,0 +1,299 @@
+.seller-profile {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.seller-hero {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding: clamp(22px, 4vw, 36px);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(246, 249, 246, 0.76)),
+        linear-gradient(135deg, rgba(22, 120, 106, 0.08), rgba(198, 93, 53, 0.1));
+    box-shadow: var(--shadow-md);
+}
+
+.seller-hero h1,
+.seller-section-head h2,
+.seller-empty h1,
+.seller-empty h2 {
+    margin: 0;
+    letter-spacing: 0;
+}
+
+.seller-hero p {
+    margin-top: 6px;
+    color: var(--color-text-muted);
+}
+
+.seller-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    height: 28px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+    border-radius: 999px;
+    color: var(--color-primary);
+    background: rgba(22, 120, 106, 0.1);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.seller-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+    gap: var(--space-3);
+}
+
+.seller-stats div {
+    min-width: 0;
+    padding: 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(22, 120, 106, 0.14);
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.seller-stats span,
+.seller-stats strong {
+    display: block;
+}
+
+.seller-stats span {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.seller-stats strong {
+    margin-top: 2px;
+    color: var(--color-text);
+    font-size: 20px;
+}
+
+.seller-stars {
+    display: inline-flex;
+    gap: 2px;
+    color: #b8b1a6;
+}
+
+.seller-stars__star--filled {
+    color: #c65d35;
+}
+
+.seller-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.44fr);
+    gap: var(--space-5);
+    align-items: start;
+}
+
+.seller-main,
+.seller-chat,
+.seller-empty,
+.seller-alert {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: rgba(255, 255, 255, 0.88);
+    box-shadow: var(--shadow-sm);
+}
+
+.seller-main,
+.seller-chat,
+.seller-empty,
+.seller-alert {
+    padding: var(--space-5);
+}
+
+.seller-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.seller-items-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4);
+}
+
+.seller-reviews {
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+}
+
+.seller-review-list {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.seller-review {
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: #f5f7f4;
+}
+
+.seller-review__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.seller-review span {
+    display: block;
+    margin-top: 4px;
+    color: var(--color-text-muted);
+    font-size: 13px;
+}
+
+.seller-review p {
+    margin-top: var(--space-3);
+    color: var(--color-text);
+}
+
+.seller-chat {
+    position: sticky;
+    top: 92px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 116px);
+}
+
+.seller-chat-list {
+    min-height: 260px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-right: 4px;
+}
+
+.seller-message {
+    max-width: 86%;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: #f5f7f4;
+}
+
+.seller-message--mine {
+    align-self: flex-end;
+    border-color: rgba(22, 120, 106, 0.18);
+    background: rgba(22, 120, 106, 0.08);
+}
+
+.seller-message__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: 6px;
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.seller-message p {
+    margin: 0;
+    color: var(--color-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.seller-chat-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.seller-chat-form textarea {
+    min-height: 92px;
+    padding: 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: var(--color-input);
+    color: var(--color-text);
+    outline: none;
+    resize: vertical;
+    font: inherit;
+}
+
+.seller-chat-form textarea:focus {
+    border-color: rgba(22, 120, 106, 0.42);
+    box-shadow: var(--shadow-focus);
+}
+
+.seller-chat__notice {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.seller-muted,
+.seller-empty p {
+    color: var(--color-text-muted);
+}
+
+.seller-alert {
+    color: var(--color-danger);
+    border-color: rgba(194, 65, 52, 0.22);
+    background: rgba(194, 65, 52, 0.08);
+}
+
+.seller-skeleton {
+    min-height: 220px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    background: rgba(255, 255, 255, 0.72);
+    position: relative;
+    overflow: hidden;
+}
+
+.seller-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-40%);
+    background: linear-gradient(90deg, transparent, rgba(22, 120, 106, 0.08), transparent);
+    animation: shimmer 1.2s infinite;
+}
+
+.seller-empty--inline {
+    box-shadow: none;
+}
+
+@media (max-width: 1020px) {
+    .seller-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .seller-chat {
+        position: static;
+        max-height: none;
+    }
+}
+
+@media (max-width: 760px) {
+    .seller-hero {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .seller-stats,
+    .seller-items-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .seller-message {
+        max-width: 100%;
+    }
+}

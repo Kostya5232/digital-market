@@ -17,6 +17,11 @@ model User {
   items  Item[]  @relation("UserItems")
   orders Order[] @relation("UserOrders")
   sales  Order[] @relation("UserSales")
+  messages OrderMessage[] @relation("OrderMessages")
+  reviewsGiven Review[] @relation("BuyerReviews")
+  reviewsReceived Review[] @relation("SellerReviews")
+  sentDirectMessages DirectMessage[] @relation("SentDirectMessages")
+  receivedDirectMessages DirectMessage[] @relation("ReceivedDirectMessages")
   balance   Int      @default(1000)
 
   ownedItems Item[] @relation("ItemOwner")
@@ -77,5 +82,66 @@ model Order {
   seller    User     @relation(fields: [sellerId], references: [id], name: "UserSales")
   sellerId  String
   price     Decimal  @db.Decimal(10, 2)
+  status    OrderStatus @default(PAID)
+  deliveryData String?
+  confirmedAt DateTime?
+  disputedAt DateTime?
+  messages  OrderMessage[]
+  review    Review?
   createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String   @unique
+  buyer     User     @relation("BuyerReviews", fields: [buyerId], references: [id])
+  buyerId   String
+  seller    User     @relation("SellerReviews", fields: [sellerId], references: [id])
+  sellerId  String
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([sellerId, createdAt])
+  @@index([buyerId, createdAt])
+}
+
+model DirectMessage {
+  id          String   @id @default(cuid())
+  sender      User     @relation("SentDirectMessages", fields: [senderId], references: [id])
+  senderId    String
+  recipient   User     @relation("ReceivedDirectMessages", fields: [recipientId], references: [id])
+  recipientId String
+  body        String
+  createdAt   DateTime @default(now())
+
+  @@index([senderId, recipientId, createdAt])
+  @@index([recipientId, senderId, createdAt])
+}
+
+enum OrderStatus {
+  PAID
+  COMPLETED
+  DISPUTED
+}
+
+model OrderMessage {
+  id        String   @id @default(cuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  author    User     @relation("OrderMessages", fields: [authorId], references: [id])
+  authorId  String
+  body      String
+  type      OrderMessageType @default(TEXT)
+  createdAt DateTime @default(now())
+
+  @@index([orderId, createdAt])
+}
+
+enum OrderMessageType {
+  TEXT
+  SYSTEM
+  DELIVERY
 }

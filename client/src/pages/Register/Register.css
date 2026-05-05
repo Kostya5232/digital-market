@@ -10,8 +10,9 @@
     max-width: 440px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.86);
     padding: 22px;
+    box-shadow: var(--shadow-md);
 }
 
 .authHead {
@@ -21,7 +22,7 @@
 .authTitle {
     margin: 0;
     font-size: 26px;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     line-height: 1.15;
 }
 
@@ -54,28 +55,28 @@
     padding: 0 12px;
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
-    background: rgba(0, 0, 0, 0.18);
+    background: var(--color-input);
     color: var(--color-text);
     outline: none;
     font-size: 14px;
 }
 
 .input:focus {
-    border-color: rgba(108, 140, 255, 0.5);
-    box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.14);
+    border-color: rgba(22, 120, 106, 0.42);
+    box-shadow: var(--shadow-focus);
 }
 
 .input::placeholder {
-    color: rgba(231, 236, 255, 0.45);
+    color: var(--color-placeholder);
 }
 
 .authAlert {
     padding: 12px 12px;
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(194, 65, 52, 0.22);
+    background: rgba(194, 65, 52, 0.08);
     font-size: 13px;
-    color: red;
+    color: var(--color-danger);
 }
 
 .authButton {
@@ -99,10 +100,11 @@
 .authLink {
     color: var(--color-text);
     text-decoration: none;
-    border-bottom: 1px dashed rgba(231, 236, 255, 0.35);
+    border-bottom: 1px dashed rgba(22, 120, 106, 0.35);
     padding-bottom: 2px;
 }
 
 .authLink:hover {
-    border-bottom-color: rgba(108, 140, 255, 0.6);
+    color: var(--color-primary);
+    border-bottom-color: rgba(22, 120, 106, 0.6);
 }

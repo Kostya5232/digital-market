@@ -1,23 +1,29 @@
 :root {
-    --color-bg: #0b0f1a;
-    --color-surface: #12182b;
-    --color-card: #161d36;
-    --color-border: #242b4a;
+    --color-bg: #f5f7f4;
+    --color-surface: #ffffff;
+    --color-card: #fbfcfa;
+    --color-border: #d8ded9;
 
-    --color-primary: #6c8cff;
-    --color-primary-hover: #5a7cff;
-    --color-accent: #22d3ee;
+    --color-primary: #16786a;
+    --color-primary-hover: #0f665a;
+    --color-accent: #c65d35;
 
-    --color-text: #e6e9f2;
-    --color-text-muted: #9aa3c7;
-    --color-danger: #ef4444;
-    --color-success: #22c55e;
+    --color-text: #1d2528;
+    --color-text-muted: #6f7775;
+    --color-danger: #c24134;
+    --color-success: #16895d;
+    --color-input: #ffffff;
+    --color-placeholder: #9ba29f;
+    --shadow-sm: 0 1px 2px rgba(36, 30, 20, 0.05);
+    --shadow-md: 0 18px 45px rgba(42, 34, 24, 0.08);
+    --shadow-focus: 0 0 0 3px rgba(22, 120, 106, 0.14);
 
     --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
     --radius-sm: 6px;
-    --radius-md: 10px;
-    --radius-lg: 14px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
 
     --space-1: 4px;
     --space-2: 8px;
@@ -41,9 +47,12 @@ body,
 
 body {
     font-family: var(--font-sans);
-    background: radial-gradient(1200px 600px at 50% -10%, #1a2250 0%, var(--color-bg) 60%);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(244, 241, 234, 0) 280px),
+        var(--color-bg);
     color: var(--color-text);
     line-height: 1.5;
+    text-rendering: optimizeLegibility;
 }
 
 h1,
@@ -54,7 +63,7 @@ h5,
 h6 {
     margin: 0;
     font-weight: 600;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
 }
 
 p {
@@ -73,4 +82,9 @@ a:hover {
 
 button {
     font-family: inherit;
+}
+
+::selection {
+    color: #ffffff;
+    background: var(--color-primary);
 }

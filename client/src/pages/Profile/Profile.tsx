@@ -18,7 +18,37 @@ type MyItem = {
     updatedAt?: string;
 };
 
+type DealStatus = "PAID" | "COMPLETED" | "DISPUTED";
+
+type Order = {
+    id: string;
+    item: { title: string };
+    price: number | string;
+    status?: DealStatus;
+    createdAt?: string;
+    seller?: { username?: string } | null;
+};
+
+type Sale = {
+    id: string;
+    item: { title: string };
+    price: number | string;
+    status?: DealStatus;
+    createdAt?: string;
+    buyer?: { username?: string } | null;
+};
+
 type Tab = "purchases" | "sales" | "items" | "settings";
+
+function initials(username: string) {
+    return username.trim().slice(0, 2).toUpperCase();
+}
+
+function dealStatusLabel(status: DealStatus | undefined, lang: "ru" | "en") {
+    if (status === "COMPLETED") return lang === "ru" ? "Завершена" : "Completed";
+    if (status === "DISPUTED") return lang === "ru" ? "Спор" : "Dispute";
+    return lang === "ru" ? "В процессе" : "In progress";
+}
 
 export default function Profile() {
     const { user, token, refreshMe } = useAuth();
@@ -26,8 +56,8 @@ export default function Profile() {
 
     const [tab, setTab] = useState<Tab>("items");
 
-    const [orders, setOrders] = useState<any[]>([]);
-    const [sales, setSales] = useState<any[]>([]);
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [sales, setSales] = useState<Sale[]>([]);
     const [myItems, setMyItems] = useState<MyItem[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -39,7 +69,11 @@ export default function Profile() {
     const [settingsMsg, setSettingsMsg] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!token) return;
+        if (!token) {
+            setLoading(false);
+            return;
+        }
+
         setLoading(true);
         Promise.all([getMyOrders(token), getMySales(token), getMyItems(token)])
             .then(([ordersData, salesData, itemsData]) => {
@@ -103,42 +137,79 @@ export default function Profile() {
         [t]
     );
 
-    if (!user) return <div className="alert">Вы не авторизованы</div>;
-    if (loading) return <div className="loading">Загрузка...</div>;
+    const listedItems = useMemo(() => myItems.filter((item) => item.status === "LISTED").length, [myItems]);
+    const soldItems = useMemo(() => myItems.filter((item) => item.status === "SOLD").length, [myItems]);
+
+    if (!user) return <div className="alert">{lang === "ru" ? "Вы не авторизованы" : "You are not authorized"}</div>;
+
+    if (loading) {
+        return (
+            <div className="profile-page">
+                <div className="profileSkeleton" />
+                <div className="profileSkeleton profileSkeleton--small" />
+            </div>
+        );
+    }
 
     return (
-        <div className="profile">
-            <div className="profileCard profileCard--wide">
-                <div className="profileHeader">
+        <div className="profile-page">
+            <section className="profileHero">
+                <div className="profileHero__identity">
+                    <div className="profileAvatar">{initials(user.username)}</div>
                     <div>
-                        <h1 className="profileTitle">{t("profile")}</h1>
+                        <span className="profileEyebrow">{t("profile")}</span>
+                        <h1 className="profileTitle">{user.username}</h1>
                         <div className="profileInfo">
-                            <span>
-                                <strong>Email:</strong> {user.email}
-                            </span>
+                            <span>{user.email}</span>
                             <span className="dot">•</span>
-                            <span>
-                                <strong>{t("nickname")}:</strong> {user.username}
-                            </span>
-                            <span className="dot">•</span>
-                            <span>
-                                <strong>Balance:</strong> {user.balance}$
-                            </span>
+                            <span>{user.role ?? "USER"}</span>
                         </div>
                     </div>
+                </div>
 
-                    <div className="profileTabs">
-                        {tabs.map((x) => (
-                            <button
-                                key={x.id}
-                                className={`tabBtn ${tab === x.id ? "tabBtn--active" : ""}`}
-                                onClick={() => setTab(x.id)}
-                                type="button"
-                            >
-                                {x.label}
-                            </button>
-                        ))}
+                <div className="profileHero__side">
+                    <div className="balancePanel">
+                        <span>{t("balance")}</span>
+                        <strong>{formatMoney(user.balance)}</strong>
+                        <p>{lang === "ru" ? "Средства доступны для покупок и сделок." : "Funds are available for purchases and deals."}</p>
                     </div>
+                    <div className="profileQuickActions">
+                        <Link to="/deals">
+                            <Button variant="secondary">{t("deals")}</Button>
+                        </Link>
+                        <Link to="/add-item">
+                            <Button>{t("addItem")}</Button>
+                        </Link>
+                    </div>
+                </div>
+            </section>
+
+            <section className="profileStats">
+                <div className="profileStat">
+                    <span>{lang === "ru" ? "Активные товары" : "Active listings"}</span>
+                    <strong>{listedItems}</strong>
+                </div>
+                <div className="profileStat">
+                    <span>{lang === "ru" ? "Продано товаров" : "Sold items"}</span>
+                    <strong>{soldItems}</strong>
+                </div>
+                <div className="profileStat">
+                    <span>{t("purchases")}</span>
+                    <strong>{orders.length}</strong>
+                </div>
+                <div className="profileStat">
+                    <span>{t("sales")}</span>
+                    <strong>{sales.length}</strong>
+                </div>
+            </section>
+
+            <section className="profileWorkspace">
+                <div className="profileTabs" role="tablist">
+                    {tabs.map((x) => (
+                        <button key={x.id} className={`tabBtn ${tab === x.id ? "tabBtn--active" : ""}`} onClick={() => setTab(x.id)} type="button">
+                            {x.label}
+                        </button>
+                    ))}
                 </div>
 
                 {actionError && <div className="alert">{actionError}</div>}
@@ -146,14 +217,23 @@ export default function Profile() {
                 {tab === "items" && (
                     <div className="profileSection">
                         <div className="sectionHead">
-                            <h2 className="sectionTitle">{t("myItems")}</h2>
+                            <div>
+                                <h2 className="sectionTitle">{t("myItems")}</h2>
+                                <p className="sectionSubtitle">{lang === "ru" ? "Управление товарами, которые вы выставили." : "Manage the items you listed."}</p>
+                            </div>
                             <Link to="/add-item">
-                                <Button variant="secondary">+ Add</Button>
+                                <Button variant="secondary">{t("addItem")}</Button>
                             </Link>
                         </div>
 
                         {myItems.length === 0 ? (
-                            <p>{lang === "ru" ? "Вы ещё не добавляли товары" : "You have no listings yet"}</p>
+                            <div className="emptyState">
+                                <h3>{lang === "ru" ? "Товаров пока нет" : "No listings yet"}</h3>
+                                <p>{lang === "ru" ? "Добавьте первый товар, чтобы он появился в каталоге." : "Add your first item to show it in the catalog."}</p>
+                                <Link to="/add-item">
+                                    <Button>{t("addItem")}</Button>
+                                </Link>
+                            </div>
                         ) : (
                             <ul className="myItemList">
                                 {myItems.map((it) => (
@@ -162,13 +242,7 @@ export default function Profile() {
                                             <div className="myItemTitle">{it.title}</div>
                                             <div className="myItemMeta">
                                                 <span className={`badge ${it.status === "SOLD" ? "badge--sold" : "badge--listed"}`}>
-                                                    {it.status === "SOLD"
-                                                        ? lang === "ru"
-                                                            ? "Продан"
-                                                            : "Sold"
-                                                        : lang === "ru"
-                                                        ? "В продаже"
-                                                        : "Listed"}
+                                                    {it.status === "SOLD" ? (lang === "ru" ? "Продан" : "Sold") : lang === "ru" ? "В продаже" : "Listed"}
                                                 </span>
                                                 <span className="dot">•</span>
                                                 <span>{formatMoney(it.price)}</span>
@@ -206,13 +280,27 @@ export default function Profile() {
                     <div className="profileSection">
                         <h2 className="sectionTitle">{t("purchases")}</h2>
                         {orders.length === 0 ? (
-                            <p>{lang === "ru" ? "Вы ещё ничего не купили" : "No purchases yet"}</p>
+                            <div className="emptyState">
+                                <h3>{lang === "ru" ? "Покупок пока нет" : "No purchases yet"}</h3>
+                                <p>{lang === "ru" ? "После покупки сделки появятся здесь и в разделе сделок." : "After a purchase, deals will appear here and in Deals."}</p>
+                            </div>
                         ) : (
                             <ul className="orderList">
                                 {orders.map((order) => (
-                                    <li key={order.id} className="orderItem">
-                                        {order.item.title} — {formatMoney(Number(order.price))} — {lang === "ru" ? "продавец" : "seller"}:{" "}
-                                        {order.seller?.username ?? "—"}
+                                    <li key={order.id} className="historyItem">
+                                        <div>
+                                            <Link to={`/deals/${order.id}`} className="historyTitle">
+                                                {order.item.title}
+                                            </Link>
+                                            <div className="historyMeta">
+                                                <span>
+                                                    {lang === "ru" ? "Продавец" : "Seller"}: {order.seller?.username ?? "—"}
+                                                </span>
+                                                <span className="dot">•</span>
+                                                <span>{dealStatusLabel(order.status, lang)}</span>
+                                            </div>
+                                        </div>
+                                        <strong>{formatMoney(Number(order.price))}</strong>
                                     </li>
                                 ))}
                             </ul>
@@ -224,13 +312,27 @@ export default function Profile() {
                     <div className="profileSection">
                         <h2 className="sectionTitle">{t("sales")}</h2>
                         {sales.length === 0 ? (
-                            <p>{lang === "ru" ? "У вас пока нет продаж" : "No sales yet"}</p>
+                            <div className="emptyState">
+                                <h3>{lang === "ru" ? "Продаж пока нет" : "No sales yet"}</h3>
+                                <p>{lang === "ru" ? "Здесь будут отображаться сделки, где вы продавец." : "Deals where you are the seller will appear here."}</p>
+                            </div>
                         ) : (
                             <ul className="saleList">
                                 {sales.map((sale) => (
-                                    <li key={sale.id} className="saleItem">
-                                        {sale.item.title} — {formatMoney(Number(sale.price))} — {lang === "ru" ? "купил" : "buyer"}:{" "}
-                                        {sale.buyer?.username ?? "—"}
+                                    <li key={sale.id} className="historyItem">
+                                        <div>
+                                            <Link to={`/deals/${sale.id}`} className="historyTitle">
+                                                {sale.item.title}
+                                            </Link>
+                                            <div className="historyMeta">
+                                                <span>
+                                                    {lang === "ru" ? "Покупатель" : "Buyer"}: {sale.buyer?.username ?? "—"}
+                                                </span>
+                                                <span className="dot">•</span>
+                                                <span>{dealStatusLabel(sale.status, lang)}</span>
+                                            </div>
+                                        </div>
+                                        <strong>{formatMoney(Number(sale.price))}</strong>
                                     </li>
                                 ))}
                             </ul>
@@ -245,7 +347,7 @@ export default function Profile() {
                         <div className="settingsGrid">
                             <div className="settingsBlock">
                                 <div className="settingsLabel">{t("language")}</div>
-                                <select className="select" value={lang} onChange={(e) => setLang(e.target.value as any)}>
+                                <select className="select" value={lang} onChange={(e) => setLang(e.target.value as "ru" | "en")}>
                                     <option value="ru">Русский</option>
                                     <option value="en">English</option>
                                 </select>
@@ -253,25 +355,18 @@ export default function Profile() {
 
                             <div className="settingsBlock">
                                 <div className="settingsLabel">{t("currency")}</div>
-                                <select className="select" value={currency} onChange={(e) => setCurrency(e.target.value as any)}>
+                                <select className="select" value={currency} onChange={(e) => setCurrency(e.target.value as "RUB" | "USD")}>
                                     <option value="RUB">RUB (₽)</option>
                                     <option value="USD">USD ($)</option>
                                 </select>
                                 <div className="mutedSmall">
-                                    {lang === "ru"
-                                        ? "USD считается по фикс-курсу (можно поменять в SettingsContext)."
-                                        : "USD uses a fixed rate (change in SettingsContext)."}
+                                    {lang === "ru" ? "USD считается по фиксированному курсу." : "USD uses a fixed rate (change in SettingsContext)."}
                                 </div>
                             </div>
 
                             <div className="settingsBlock settingsBlock--full">
                                 <div className="settingsLabel">{t("nickname")}</div>
-                                <input
-                                    className="input"
-                                    value={newUsername}
-                                    onChange={(e) => setNewUsername(e.target.value)}
-                                    placeholder="username"
-                                />
+                                <input className="input" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} placeholder="username" />
                                 <div className="settingsActions">
                                     <Button onClick={saveUsername} disabled={savingUser}>
                                         {savingUser ? (lang === "ru" ? "Сохранение..." : "Saving...") : t("save")}
@@ -282,7 +377,7 @@ export default function Profile() {
                         </div>
                     </div>
                 )}
-            </div>
+            </section>
         </div>
     );
 }

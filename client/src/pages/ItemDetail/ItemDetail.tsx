@@ -19,6 +19,14 @@ type Item = {
 
     sellerId?: string;
     ownerId?: string | null;
+    seller?: {
+        id: string;
+        username: string;
+        rating?: {
+            average: number | null;
+            count: number;
+        };
+    };
 
     hasImage?: boolean;
     updatedAt?: string;
@@ -28,8 +36,8 @@ type Item = {
 export default function ItemDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user, token } = useAuth();
-    const { formatMoney, lang } = useSettings();
+    const { user, token, refreshMe } = useAuth();
+    const { t, formatMoney, lang } = useSettings();
 
     const [item, setItem] = useState<Item | null>(null);
     const [loading, setLoading] = useState(true);
@@ -62,6 +70,7 @@ export default function ItemDetail() {
 
                     sellerId: data.sellerId ?? data.seller_id,
                     ownerId: data.ownerId ?? data.owner_id,
+                    seller: data.seller,
 
                     hasImage: data.hasImage ?? Boolean(data.imageMime ?? data.image_mime),
                     updatedAt: data.updatedAt ?? data.updated_at,
@@ -105,8 +114,9 @@ export default function ItemDetail() {
                 return;
             }
 
-            await buyItem(token, item.id);
-            setError(lang === "ru" ? "Покупка успешно оформлена!" : "Purchase completed!");
+            const order = await buyItem(token, item.id);
+            await refreshMe();
+            navigate(`/deals/${order.id}`);
         } catch {
             setError(lang === "ru" ? "Не удалось оформить покупку." : "Failed to buy item.");
         } finally {
@@ -173,6 +183,12 @@ export default function ItemDetail() {
                         <p className="product__meta">
                             {lang === "ru" ? "Категория" : "Category"}: {categoryLabel(item.category, lang)}
                         </p>
+                        {item.seller && (
+                            <Link to={`/users/${item.seller.id}`} className="product__seller">
+                                <span>{t("seller")}: {item.seller.username}</span>
+                                <strong>{item.seller.rating?.average ? `★ ${item.seller.rating.average} (${item.seller.rating.count})` : t("noRating")}</strong>
+                            </Link>
+                        )}
                     </div>
 
                     <div className="product__price">{formatMoney(item.price)}</div>

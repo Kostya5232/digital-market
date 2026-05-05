@@ -16,11 +16,19 @@ type Item = {
     category: ItemCategory;
     hasImage?: boolean;
     updatedAt?: string;
+    seller?: {
+        id: string;
+        username: string;
+        rating?: {
+            average: number | null;
+            count: number;
+        };
+    };
 };
 
 export default function Home() {
     const { user } = useAuth();
-    const { t, lang } = useSettings();
+    const { t, lang, formatMoney } = useSettings();
 
     const [items, setItems] = useState<Item[]>([]);
     const [loading, setLoading] = useState(true);
@@ -56,22 +64,47 @@ export default function Home() {
 
     return (
         <div className="page-stack">
-            <div className="page-head">
-                <div>
-                    <h1 className="page-title">{t("catalog")}</h1>
-                    <p className="page-subtitle">{t("catalogSubtitle")}</p>
+            <section className="market-hero">
+                <div className="market-hero__copy">
+                    <span className="eyebrow">{t("catalog")}</span>
+                    <h1 className="page-title">{t("marketTitle")}</h1>
+                    <p className="page-subtitle">{t("marketSubtitle")}</p>
+
+                    <div className="page-actions">
+                        {user ? (
+                            <Link to="/add-item">
+                                <Button>{t("addItem")}</Button>
+                            </Link>
+                        ) : (
+                            <Link to="/login">
+                                <Button>{t("login")}</Button>
+                            </Link>
+                        )}
+                    </div>
                 </div>
 
-                <div className="page-actions">
-                    {user ? (
-                        <Link to="/add-item">
-                            <Button>{t("addItem")}</Button>
-                        </Link>
-                    ) : (
-                        <Link to="/login">
-                            <Button>{t("login")}</Button>
-                        </Link>
-                    )}
+                <aside className="wallet-panel">
+                    <div className="wallet-panel__label">{t("balance")}</div>
+                    <div className="wallet-panel__value">{user ? formatMoney(user.balance) : "—"}</div>
+                    <p className="wallet-panel__hint">{user ? t("walletHint") : t("guestWalletHint")}</p>
+
+                    <div className="wallet-panel__stats">
+                        <div>
+                            <span>{loading ? "…" : items.length}</span>
+                            <small>{t("availableNow")}</small>
+                        </div>
+                        <div>
+                            <span>{CATEGORIES.length}</span>
+                            <small>{t("categoriesCount")}</small>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+
+            <div className="catalog-head">
+                <div>
+                    <h2 className="catalog-head__title">{t("catalog")}</h2>
+                    <p className="catalog-head__text">{t("catalogSubtitle")}</p>
                 </div>
             </div>
 
@@ -81,9 +114,9 @@ export default function Home() {
                     <input className="searchbox__input" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("searchByTitle")} />
                 </div>
 
-                <div className="searchbox" style={{ maxWidth: 280 }}>
+                <div className="searchbox searchbox--select">
                     <span className="searchbox__icon">≡</span>
-                    <select className="categorySelect" value={category} onChange={(e) => setCategory(e.target.value as any)}>
+                    <select className="categorySelect" value={category} onChange={(e) => setCategory(e.target.value as ItemCategory | "ALL")}>
                         <option value="ALL">{t("allCategories")}</option>
                         {CATEGORIES.map((c) => (
                             <option key={c} value={c}>

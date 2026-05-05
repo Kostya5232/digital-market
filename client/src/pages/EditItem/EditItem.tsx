@@ -20,7 +20,7 @@ type Item = {
 
     category: ItemCategory;
 
-    sellerId?: string; 
+    sellerId?: string;
     ownerId?: string | null;
 
     hasImage?: boolean;
@@ -43,7 +43,7 @@ export default function EditItem() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [price, setPrice] = useState<number>(0);
-    const [category, setCategory] = useState<ItemCategory>("OTHER");
+    const [category, setCategory] = useState<ItemCategory>(ItemCategory.OTHER);
 
     const [newImageFile, setNewImageFile] = useState<File | null>(null);
     const [removeImage, setRemoveImage] = useState(false);
@@ -108,7 +108,7 @@ export default function EditItem() {
                     setPrice(Number.isFinite(normalized.price) ? normalized.price : 0);
                     setCategory(normalized.category);
                 }
-            } catch (e: any) {
+            } catch {
                 if (!cancelled) setError("Не удалось загрузить товар.");
             } finally {
                 if (!cancelled) setLoading(false);
@@ -189,7 +189,7 @@ export default function EditItem() {
             setRemoveImage(false);
 
             navigate(`/items/${next.id}`);
-        } catch (e: any) {
+        } catch {
             setError("Ошибка при сохранении. Проверь поля и попробуй снова.");
         } finally {
             setSaving(false);
@@ -257,7 +257,7 @@ export default function EditItem() {
                 <form className="editForm" onSubmit={onSave}>
                     <div className="field">
                         <label className="label">{lang === "ru" ? "Категория" : "Category"}</label>
-                        <select className="input" value={category} onChange={(e) => setCategory(e.target.value as any)}>
+                        <select className="input" value={category} onChange={(e) => setCategory(e.target.value as ItemCategory)}>
                             {CATEGORIES.map((c) => (
                                 <option key={c} value={c}>
                                     {categoryLabel(c, lang)}

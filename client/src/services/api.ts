@@ -1,3 +1,4 @@
 export { API_URL, login, register, getMe } from "../api/auth";
 export { fetchItems, fetchItem, createItem } from "../api/items";
-export { buyItem, getMyOrders, getMySales } from "../api/orders";
+export { buyItem, getMyOrders, getMySales, getDeal, sendDealMessage, updateDealDelivery, confirmDeal, openDealDispute } from "../api/orders";
+export { getSellerProfile, getDirectMessages, sendDirectMessage } from "../api/users";

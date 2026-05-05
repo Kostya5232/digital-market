@@ -8,6 +8,9 @@ import AddItem from "./pages/AddItem/AddItem";
 import ItemDetail from "./pages/ItemDetail/ItemDetail";
 import Navbar from "./components/ui/Navbar/Navbar";
 import EditItem from "./pages/EditItem/EditItem";
+import Deals from "./pages/Deals/Deals";
+import DealDetail from "./pages/DealDetail/DealDetail";
+import SellerProfile from "./pages/SellerProfile/SellerProfile";
 
 export default function App() {
     return (
@@ -22,6 +25,9 @@ export default function App() {
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/register" element={<Register />} />
                                 <Route path="/profile" element={<Profile />} />
+                                <Route path="/deals" element={<Deals />} />
+                                <Route path="/deals/:id" element={<DealDetail />} />
+                                <Route path="/users/:id" element={<SellerProfile />} />
                                 <Route path="/add-item" element={<AddItem />} />
                                 <Route path="/items/:id" element={<ItemDetail />} />
                                 <Route path="/items/:id/edit" element={<EditItem />} />

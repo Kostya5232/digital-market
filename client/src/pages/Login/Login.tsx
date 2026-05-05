@@ -28,7 +28,7 @@ export default function Login() {
             const data = await login(username.trim(), password);
             authLogin(data.token);
             navigate("/");
-        } catch (err: any) {
+        } catch {
             setError("Неверный логин или пароль.");
         } finally {
             setLoading(false);

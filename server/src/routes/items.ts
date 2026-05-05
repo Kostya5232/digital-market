@@ -38,6 +38,32 @@ const updateMultipartSchema = z.object({
     removeImage: z.enum(["true", "false"]).optional(),
 });
 
+async function getSellerRatings(sellerIds: string[]) {
+    const ids = Array.from(new Set(sellerIds)).filter(Boolean);
+    if (ids.length === 0) return new Map<string, { average: number | null; count: number }>();
+
+    const rows = await prisma.review.groupBy({
+        by: ["sellerId"],
+        where: { sellerId: { in: ids } },
+        _avg: { rating: true },
+        _count: { _all: true },
+    });
+
+    return new Map(
+        rows.map((row) => [
+            row.sellerId,
+            {
+                average: row._avg.rating == null ? null : Number(row._avg.rating.toFixed(1)),
+                count: row._count._all,
+            },
+        ])
+    );
+}
+
+function ratingFor(ratings: Map<string, { average: number | null; count: number }>, sellerId: string) {
+    return ratings.get(sellerId) ?? { average: null, count: 0 };
+}
+
 // Получить список товаров
 router.get("/", async (req, res, next) => {
     try {
@@ -64,15 +90,23 @@ router.get("/", async (req, res, next) => {
                 price: true,
                 status: true,
                 category: true,
+                updatedAt: true,
                 imageMime: true,
                 seller: { select: { id: true, username: true } },
             },
         });
 
+        const ratings = await getSellerRatings(items.map((i) => i.seller.id));
+
         res.json(
             items.map((i) => ({
                 ...i,
+                price: i.price.toNumber(),
                 hasImage: Boolean(i.imageMime),
+                seller: {
+                    ...i.seller,
+                    rating: ratingFor(ratings, i.seller.id),
+                },
             }))
         );
     } catch (err) {
@@ -157,10 +191,16 @@ router.get("/:id", async (req, res, next) => {
         });
 
         if (!item) return res.status(404).json({ message: "Item not found" });
+        const ratings = await getSellerRatings([item.seller.id]);
 
         res.json({
             ...item,
+            price: item.price.toNumber(),
             hasImage: Boolean(item.imageMime),
+            seller: {
+                ...item.seller,
+                rating: ratingFor(ratings, item.seller.id),
+            },
         });
     } catch (err) {
         next(err);

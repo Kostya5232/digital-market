@@ -10,8 +10,9 @@
     max-width: 820px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.86);
     padding: 22px;
+    box-shadow: var(--shadow-md);
 }
 
 .editHead {
@@ -25,7 +26,7 @@
 .editTitle {
     margin: 0;
     font-size: 26px;
-    letter-spacing: -0.02em;
+    letter-spacing: 0;
     line-height: 1.15;
 }
 
@@ -43,10 +44,11 @@
 .editAlert {
     padding: 12px 12px;
     border-radius: var(--radius-lg);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(194, 65, 52, 0.22);
+    background: rgba(194, 65, 52, 0.08);
     font-size: 13px;
     margin: 12px 0 18px 0;
+    color: var(--color-danger);
 }
 
 .editForm {
@@ -71,7 +73,7 @@
     padding: 0 12px;
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
-    background: rgba(0, 0, 0, 0.18);
+    background: var(--color-input);
     color: var(--color-text);
     outline: none;
     font-size: 14px;
@@ -82,7 +84,7 @@
     padding: 10px 12px;
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
-    background: rgba(0, 0, 0, 0.18);
+    background: var(--color-input);
     color: var(--color-text);
     outline: none;
     font-size: 14px;
@@ -91,13 +93,13 @@
 
 .input:focus,
 .textarea:focus {
-    border-color: rgba(108, 140, 255, 0.5);
-    box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.14);
+    border-color: rgba(22, 120, 106, 0.42);
+    box-shadow: var(--shadow-focus);
 }
 
 .input::placeholder,
 .textarea::placeholder {
-    color: rgba(231, 236, 255, 0.45);
+    color: var(--color-placeholder);
 }
 
 .imageBlock {
@@ -105,7 +107,7 @@
     padding: 14px;
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-border);
-    background: rgba(0, 0, 0, 0.14);
+    background: #f5f7f4;
 }
 
 .imageBlock__top {
@@ -118,7 +120,7 @@
 
 .imageBlock__title {
     font-weight: 700;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
 }
 
 .imageBlock__hint {
@@ -170,7 +172,7 @@
 .imageBox__frame {
     border-radius: var(--radius-xl);
     border: 1px solid var(--color-border);
-    background: rgba(255, 255, 255, 0.03);
+    background: #ffffff;
     height: 240px;
     overflow: hidden;
     display: flex;
@@ -210,7 +212,7 @@
     height: 44px;
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.7);
     position: relative;
     overflow: hidden;
     margin-bottom: 12px;
@@ -221,7 +223,7 @@
     position: absolute;
     inset: 0;
     transform: translateX(-40%);
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    background: linear-gradient(90deg, transparent, rgba(22, 120, 106, 0.08), transparent);
     animation: shimmer 1.2s infinite;
 }
 

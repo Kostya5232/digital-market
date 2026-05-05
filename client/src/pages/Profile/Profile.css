@@ -10,17 +10,29 @@
     max-width: 440px;
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
+<<<<<<< ours
     background: rgba(255, 255, 255, 0.03);
+=======
+    background: rgba(255, 255, 255, 0.86);
+>>>>>>> theirs
     padding: 22px;
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
+<<<<<<< ours
+=======
+    box-shadow: var(--shadow-md);
+>>>>>>> theirs
 }
 
 .profileTitle {
     margin: 0;
     font-size: 26px;
+<<<<<<< ours
     letter-spacing: -0.02em;
+=======
+    letter-spacing: 0;
+>>>>>>> theirs
     line-height: 1.15;
 }
 
@@ -42,7 +54,11 @@
 .sectionTitle {
     font-size: 20px;
     font-weight: 600;
+<<<<<<< ours
     letter-spacing: -0.02em;
+=======
+    letter-spacing: 0;
+>>>>>>> theirs
 }
 
 .orderList,
@@ -53,7 +69,11 @@
 
 .orderItem,
 .saleItem {
+<<<<<<< ours
     background: rgba(255, 255, 255, 0.05);
+=======
+    background: #f5f7f4;
+>>>>>>> theirs
     border-radius: var(--radius-lg);
     margin: 6px 0;
     padding: 12px;
@@ -65,7 +85,11 @@
 
 .orderItem:hover,
 .saleItem:hover {
+<<<<<<< ours
     background: rgba(255, 255, 255, 0.1);
+=======
+    background: #eef4ef;
+>>>>>>> theirs
 }
 
 .loading {
@@ -77,10 +101,17 @@
 .alert {
     padding: 12px;
     border-radius: var(--radius-lg);
+<<<<<<< ours
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.04);
     font-size: 13px;
     color: red;
+=======
+    border: 1px solid rgba(194, 65, 52, 0.22);
+    background: rgba(194, 65, 52, 0.08);
+    font-size: 13px;
+    color: var(--color-danger);
+>>>>>>> theirs
 }
 
 .profileCard {
@@ -106,7 +137,11 @@
 .myItemRow {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
+<<<<<<< ours
     background: rgba(255, 255, 255, 0.04);
+=======
+    background: #ffffff;
+>>>>>>> theirs
     padding: 12px;
     display: flex;
     align-items: center;
@@ -123,7 +158,11 @@
 
 .myItemTitle {
     font-weight: 700;
+<<<<<<< ours
     letter-spacing: -0.01em;
+=======
+    letter-spacing: 0;
+>>>>>>> theirs
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -147,6 +186,7 @@
     padding: 4px 8px;
     border-radius: 999px;
     border: 1px solid var(--color-border);
+<<<<<<< ours
     background: rgba(0, 0, 0, 0.18);
 }
 
@@ -156,6 +196,19 @@
 
 .badge--sold {
     border-color: rgba(255, 120, 120, 0.25);
+=======
+    background: #f5f7f4;
+}
+
+.badge--listed {
+    border-color: rgba(22, 120, 106, 0.25);
+    color: var(--color-primary);
+}
+
+.badge--sold {
+    border-color: rgba(194, 65, 52, 0.25);
+    color: var(--color-danger);
+>>>>>>> theirs
 }
 
 .myItemActions {
@@ -187,7 +240,11 @@
 
 .tabBtn {
     border: 1px solid var(--color-border);
+<<<<<<< ours
     background: rgba(0, 0, 0, 0.18);
+=======
+    background: #ffffff;
+>>>>>>> theirs
     color: var(--color-text);
     padding: 8px 12px;
     border-radius: 999px;
@@ -196,8 +253,14 @@
 }
 
 .tabBtn--active {
+<<<<<<< ours
     border-color: rgba(108, 140, 255, 0.55);
     box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.14);
+=======
+    color: var(--color-primary);
+    border-color: rgba(22, 120, 106, 0.42);
+    box-shadow: var(--shadow-focus);
+>>>>>>> theirs
 }
 
 .settingsGrid {
@@ -210,7 +273,11 @@
 .settingsBlock {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-xl);
+<<<<<<< ours
     background: rgba(0, 0, 0, 0.14);
+=======
+    background: #f5f7f4;
+>>>>>>> theirs
     padding: 12px;
     display: flex;
     flex-direction: column;
@@ -231,11 +298,35 @@
     padding: 0 12px;
     border-radius: var(--radius-lg);
     border: 1px solid var(--color-border);
+<<<<<<< ours
     background: rgba(0, 0, 0, 0.18);
+=======
+    background: var(--color-input);
+>>>>>>> theirs
     color: var(--color-text);
     outline: none;
 }
 
+<<<<<<< ours
+=======
+.input {
+    height: 42px;
+    padding: 0 12px;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    background: var(--color-input);
+    color: var(--color-text);
+    outline: none;
+    font-size: 14px;
+}
+
+.select:focus,
+.input:focus {
+    border-color: rgba(22, 120, 106, 0.42);
+    box-shadow: var(--shadow-focus);
+}
+
+>>>>>>> theirs
 .settingsActions {
     display: flex;
     align-items: center;
@@ -249,12 +340,22 @@
 }
 
 .dangerBtn {
+<<<<<<< ours
     background: rgba(255, 70, 70, 0.16) !important;
     border: 1px solid rgba(255, 70, 70, 0.35) !important;
 }
 .dangerBtn:hover {
     background: rgba(255, 70, 70, 0.24) !important;
     border-color: rgba(255, 70, 70, 0.55) !important;
+=======
+    background: rgba(194, 65, 52, 0.1) !important;
+    border: 1px solid rgba(194, 65, 52, 0.24) !important;
+    color: var(--color-danger) !important;
+}
+.dangerBtn:hover {
+    background: rgba(194, 65, 52, 0.16) !important;
+    border-color: rgba(194, 65, 52, 0.34) !important;
+>>>>>>> theirs
 }
 
 @media (max-width: 760px) {

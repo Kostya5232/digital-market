@@ -13,10 +13,18 @@ type Item = {
     category: ItemCategory;
     hasImage?: boolean;
     updatedAt?: string;
+    seller?: {
+        id: string;
+        username: string;
+        rating?: {
+            average: number | null;
+            count: number;
+        };
+    };
 };
 
 export default function ItemCard({ item }: { item: Item }) {
-    const { formatMoney, lang } = useSettings();
+    const { t, formatMoney, lang } = useSettings();
     const imgSrc =
         item.hasImage && item.updatedAt
             ? `${API_URL}/items/${item.id}/image?v=${encodeURIComponent(item.updatedAt)}`
@@ -25,29 +33,41 @@ export default function ItemCard({ item }: { item: Item }) {
             : null;
 
     return (
-        <Link to={`/items/${item.id}`} className="itemcard">
-            <div className="itemcard__media">
+        <article className="itemcard">
+            <Link to={`/items/${item.id}`} className="itemcard__media">
                 {imgSrc ? (
                     <img className="itemcard__img" src={imgSrc} alt={item.title} loading="lazy" />
                 ) : (
                     <div className="itemcard__placeholder">No image</div>
                 )}
-            </div>
+            </Link>
 
             <div className="itemcard__body">
                 <div className="itemcard__top">
-                    <div className="itemcard__title">{item.title}</div>
+                    <Link to={`/items/${item.id}`} className="itemcard__title">
+                        {item.title}
+                    </Link>
                     <div className="itemcard__price">{formatMoney(item.price)}</div>
                 </div>
 
-                <div className="itemcard__badge">{categoryLabel(item.category, lang)}</div>
+                <div className="itemcard__metaRow">
+                    <div className="itemcard__badge">{categoryLabel(item.category, lang)}</div>
+                    {item.seller && (
+                        <Link to={`/users/${item.seller.id}`} className="itemcard__seller">
+                            <span>{item.seller.username}</span>
+                            <strong>{item.seller.rating?.average ? `★ ${item.seller.rating.average}` : t("noRating")}</strong>
+                        </Link>
+                    )}
+                </div>
 
                 <div className="itemcard__desc">{item.description?.trim() ? item.description : "Описание отсутствует."}</div>
 
                 <div className="itemcard__cta">
-                    <Button variant="secondary">Открыть</Button>
+                    <Link to={`/items/${item.id}`}>
+                        <Button variant="secondary">{t("open")}</Button>
+                    </Link>
                 </div>
             </div>
-        </Link>
+        </article>
     );
 }

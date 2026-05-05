@@ -6,7 +6,7 @@ import "./Navbar.css";
 
 export default function Navbar() {
     const { user, logout } = useAuth();
-    const { t } = useSettings();
+    const { t, formatMoney } = useSettings();
 
     return (
         <header className="topbar">
@@ -27,6 +27,10 @@ export default function Navbar() {
                                     {t("profileNav")}
                                 </NavLink>
 
+                                <NavLink to="/deals" className={({ isActive }) => (isActive ? "navlink navlink--active" : "navlink")}>
+                                    {t("deals")}
+                                </NavLink>
+
                                 <NavLink to="/add-item" className={({ isActive }) => (isActive ? "navlink navlink--active" : "navlink")}>
                                     {t("addItem")}
                                 </NavLink>
@@ -40,6 +44,9 @@ export default function Navbar() {
                         <>
                             <span className="userchip">
                                 {t("hello")}, {user.username}
+                            </span>
+                            <span className="balancechip">
+                                {t("balance")}: {formatMoney(user.balance)}
                             </span>
                             <Button variant="ghost" onClick={logout}>
                                 {t("logout")}
