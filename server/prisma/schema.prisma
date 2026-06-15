@@ -22,6 +22,9 @@ model User {
   reviewsReceived Review[] @relation("SellerReviews")
   sentDirectMessages DirectMessage[] @relation("SentDirectMessages")
   receivedDirectMessages DirectMessage[] @relation("ReceivedDirectMessages")
+  buyerPayments Payment[] @relation("BuyerPayments")
+  sellerPayments Payment[] @relation("SellerPayments")
+  walletTransactions WalletTransaction[]
   balance   Int      @default(1000)
 
   ownedItems Item[] @relation("ItemOwner")
@@ -76,7 +79,7 @@ enum ItemStatus {
 model Order {
   id        String   @id @default(cuid())
   item      Item     @relation(fields: [itemId], references: [id])
-  itemId    String   @unique
+  itemId    String
   buyer     User     @relation(fields: [buyerId], references: [id], name: "UserOrders")
   buyerId   String
   seller    User     @relation(fields: [sellerId], references: [id], name: "UserSales")
@@ -86,9 +89,16 @@ model Order {
   deliveryData String?
   confirmedAt DateTime?
   disputedAt DateTime?
+  cancelledAt DateTime?
   messages  OrderMessage[]
   review    Review?
+  payment   Payment?
+  walletTransactions WalletTransaction[]
   createdAt DateTime @default(now())
+
+  @@index([buyerId, createdAt])
+  @@index([sellerId, createdAt])
+  @@index([status, createdAt])
 }
 
 model Review {
@@ -125,6 +135,70 @@ enum OrderStatus {
   PAID
   COMPLETED
   DISPUTED
+  CANCELLED
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId           String        @unique
+  buyer             User          @relation("BuyerPayments", fields: [buyerId], references: [id])
+  buyerId           String
+  seller            User          @relation("SellerPayments", fields: [sellerId], references: [id])
+  sellerId          String
+  method            PaymentMethod
+  status            PaymentStatus @default(PENDING)
+  amount            Decimal       @db.Decimal(10, 2)
+  provider          String?
+  providerPaymentId String?       @unique
+  releasedAt        DateTime?
+  refundedAt        DateTime?
+  walletTransactions WalletTransaction[]
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@index([buyerId, createdAt])
+  @@index([sellerId, createdAt])
+  @@index([status, createdAt])
+}
+
+model WalletTransaction {
+  id           String                @id @default(cuid())
+  user         User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  order        Order?                @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  orderId      String?
+  payment      Payment?              @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  paymentId    String?
+  type         WalletTransactionType
+  amount       Decimal               @db.Decimal(10, 2)
+  balanceAfter Int
+  note         String?
+  createdAt    DateTime              @default(now())
+
+  @@index([userId, createdAt])
+  @@index([orderId])
+  @@index([paymentId])
+}
+
+enum PaymentMethod {
+  BALANCE
+  CARD
+  SBP
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  RELEASED
+  REFUNDED
+  FAILED
+}
+
+enum WalletTransactionType {
+  PURCHASE_HOLD
+  REFUND
+  SALE_RELEASE
 }
 
 model OrderMessage {

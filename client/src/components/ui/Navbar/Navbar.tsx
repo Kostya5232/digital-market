@@ -13,7 +13,7 @@ export default function Navbar() {
             <div className="container topbar__inner">
                 <div className="topbar__left">
                     <Link to="/" className="brand">
-                        LootHab
+                        ЛутХаб
                     </Link>
 
                     <nav className="nav">

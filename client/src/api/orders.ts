@@ -1,8 +1,10 @@
 import { API_URL } from "./auth";
 import { ItemCategory } from "../lib/categories";
 
-export type DealStatus = "PAID" | "COMPLETED" | "DISPUTED";
+export type DealStatus = "PAID" | "COMPLETED" | "DISPUTED" | "CANCELLED";
 export type DealMessageType = "TEXT" | "SYSTEM" | "DELIVERY";
+export type PaymentMethod = "BALANCE" | "CARD" | "SBP";
+export type PaymentStatus = "PENDING" | "PAID" | "RELEASED" | "REFUNDED" | "FAILED";
 
 export type DealUser = {
     id: string;
@@ -42,6 +44,18 @@ export type DealMessage = {
     author: DealUser;
 };
 
+export type DealPayment = {
+    id: string;
+    method: PaymentMethod;
+    status: PaymentStatus;
+    amount: number;
+    provider?: string | null;
+    providerPaymentId?: string | null;
+    releasedAt?: string | null;
+    refundedAt?: string | null;
+    createdAt: string;
+};
+
 export type Deal = {
     id: string;
     itemId: string;
@@ -52,10 +66,12 @@ export type Deal = {
     deliveryData?: string | null;
     confirmedAt?: string | null;
     disputedAt?: string | null;
+    cancelledAt?: string | null;
     createdAt: string;
     item: DealItem;
     buyer: DealUser;
     seller: DealUser;
+    payment?: DealPayment | null;
     messages?: DealMessage[];
     review?: DealReview | null;
     _count?: { messages: number };
@@ -87,8 +103,11 @@ export async function getDeal(token: string, orderId: string) {
     return request<Deal>(`${API_URL}/orders/${orderId}`, token);
 }
 
-export async function buyItem(token: string, itemId: string) {
-    return request<Deal>(`${API_URL}/orders/purchase/${itemId}`, token, { method: "POST" });
+export async function buyItem(token: string, itemId: string, paymentMethod: PaymentMethod = "BALANCE") {
+    return request<Deal>(`${API_URL}/orders/purchase/${itemId}`, token, {
+        method: "POST",
+        body: JSON.stringify({ paymentMethod }),
+    });
 }
 
 export async function sendDealMessage(token: string, orderId: string, body: string) {
@@ -111,6 +130,10 @@ export async function confirmDeal(token: string, orderId: string) {
 
 export async function openDealDispute(token: string, orderId: string) {
     return request<Deal>(`${API_URL}/orders/${orderId}/dispute`, token, { method: "POST" });
+}
+
+export async function refundDeal(token: string, orderId: string) {
+    return request<Deal>(`${API_URL}/orders/${orderId}/refund`, token, { method: "POST" });
 }
 
 export async function createDealReview(token: string, orderId: string, rating: number, comment: string) {

@@ -6,6 +6,7 @@ import { useSettings } from "../../context/SettingsContext";
 import { fetchItem, buyItem } from "../../services/api";
 import { deleteItem } from "../../api/items";
 import { API_URL } from "../../api/auth";
+import type { PaymentMethod } from "../../api/orders";
 import { ItemCategory, categoryLabel } from "../../lib/categories";
 import "./ItemDetail.css";
 
@@ -43,6 +44,8 @@ export default function ItemDetail() {
     const [loading, setLoading] = useState(true);
     const [buying, setBuying] = useState(false);
     const [deleting, setDeleting] = useState(false);
+    const [checkoutOpen, setCheckoutOpen] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("BALANCE");
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -97,8 +100,36 @@ export default function ItemDetail() {
     }, [item]);
 
     const isSeller = Boolean(user && item && item.sellerId && user.id === item.sellerId);
+    const canPayWithBalance = Boolean(user && item && user.balance >= Math.round(item.price));
+    const paymentOptions = [
+        {
+            id: "BALANCE" as const,
+            icon: "wallet",
+            label: lang === "ru" ? "Баланс сайта" : "Site balance",
+            text: lang === "ru" ? "Списание с внутреннего баланса" : "Use internal wallet funds",
+            disabled: !canPayWithBalance,
+        },
+        {
+            id: "CARD" as const,
+            icon: "card",
+            label: lang === "ru" ? "Банковская карта RU" : "Bank card",
+            text: lang === "ru" ? "Оплата картой" : "Сard payment",
+            disabled: false,
+        },
+        {
+            id: "SBP" as const,
+            icon: "sbp",
+            label: lang === "ru" ? "СБП (оплата по QR)" : "SBP (QR payment)",
+            text: lang === "ru" ? "Оплата по СБП" : "SBP payment",
+            disabled: false,
+        },
+    ];
 
-    async function handleBuy() {
+    useEffect(() => {
+        if (user && item && paymentMethod === "BALANCE" && !canPayWithBalance) setPaymentMethod("CARD");
+    }, [canPayWithBalance, item, paymentMethod, user]);
+
+    async function handleBuy(method: PaymentMethod = paymentMethod) {
         if (!item) return;
         if (!user) {
             setError(lang === "ru" ? "Сначала войди в аккаунт, чтобы купить товар." : "Please log in to buy.");
@@ -114,7 +145,7 @@ export default function ItemDetail() {
                 return;
             }
 
-            const order = await buyItem(token, item.id);
+            const order = await buyItem(token, item.id, method);
             await refreshMe();
             navigate(`/deals/${order.id}`);
         } catch {
@@ -185,8 +216,12 @@ export default function ItemDetail() {
                         </p>
                         {item.seller && (
                             <Link to={`/users/${item.seller.id}`} className="product__seller">
-                                <span>{t("seller")}: {item.seller.username}</span>
-                                <strong>{item.seller.rating?.average ? `★ ${item.seller.rating.average} (${item.seller.rating.count})` : t("noRating")}</strong>
+                                <span>
+                                    {t("seller")}: {item.seller.username}
+                                </span>
+                                <strong>
+                                    {item.seller.rating?.average ? `★ ${item.seller.rating.average} (${item.seller.rating.count})` : t("noRating")}
+                                </strong>
                             </Link>
                         )}
                     </div>
@@ -205,6 +240,61 @@ export default function ItemDetail() {
 
                 {error && <div className="alert">{error}</div>}
 
+                {!isSeller && item.status !== "SOLD" && checkoutOpen && (
+                    <div className="checkout-panel">
+                        <div className="checkout-panel__head">
+                            <div>
+                                <h3>{lang === "ru" ? "Способ оплаты" : "Payment method"}</h3>
+                                <p>
+                                    {lang === "ru"
+                                        ? "Деньги будут зарезервированы в сделке до подтверждения получения."
+                                        : "Funds will stay reserved in the deal until receipt is confirmed."}
+                                </p>
+                            </div>
+                            {user && (
+                                <span>
+                                    {t("balance")}: {formatMoney(user.balance)}
+                                </span>
+                            )}
+                        </div>
+
+                        <div className="payment-options" role="radiogroup" aria-label={lang === "ru" ? "Способ оплаты" : "Payment method"}>
+                            {paymentOptions.map((option) => (
+                                <button
+                                    className={paymentMethod === option.id ? "payment-option payment-option--active" : "payment-option"}
+                                    disabled={option.disabled}
+                                    key={option.id}
+                                    onClick={() => setPaymentMethod(option.id)}
+                                    type="button"
+                                >
+                                    <span className={`payment-option__icon payment-option__icon--${option.icon}`} aria-hidden="true">
+                                        {option.icon === "wallet" && "₽"}
+                                    </span>
+                                    <span className="payment-option__text">
+                                        <strong>{option.label}</strong>
+                                        <span>{option.disabled ? (lang === "ru" ? "Недостаточно средств" : "Insufficient funds") : option.text}</span>
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="checkout-panel__summary">
+                            <span>{lang === "ru" ? "К оплате" : "Total"}</span>
+                            <strong>{formatMoney(item.price)}</strong>
+                        </div>
+
+                        <Button onClick={() => handleBuy()} disabled={buying || (paymentMethod === "BALANCE" && !canPayWithBalance)}>
+                            {buying
+                                ? lang === "ru"
+                                    ? "Оформление..."
+                                    : "Processing..."
+                                : lang === "ru"
+                                  ? "Оплатить и создать сделку"
+                                  : "Pay and create deal"}
+                        </Button>
+                    </div>
+                )}
+
                 <div className="product__actions">
                     <Link to="/">
                         <Button variant="secondary">{lang === "ru" ? "Назад" : "Back"}</Button>
@@ -221,18 +311,22 @@ export default function ItemDetail() {
                             </Button>
                         </>
                     ) : (
-                        <Button onClick={handleBuy} disabled={buying || item.status === "SOLD"}>
+                        <Button onClick={() => setCheckoutOpen((prev) => !prev)} disabled={buying || item.status === "SOLD"}>
                             {item.status === "SOLD"
                                 ? lang === "ru"
                                     ? "Продано"
                                     : "Sold"
                                 : buying
-                                ? lang === "ru"
-                                    ? "Покупка..."
-                                    : "Buying..."
-                                : lang === "ru"
-                                ? "Купить"
-                                : "Buy"}
+                                  ? lang === "ru"
+                                      ? "Покупка..."
+                                      : "Buying..."
+                                  : lang === "ru"
+                                    ? checkoutOpen
+                                        ? "Скрыть оплату"
+                                        : "Купить"
+                                    : checkoutOpen
+                                      ? "Hide payment"
+                                      : "Buy"}
                         </Button>
                     )}
                 </div>

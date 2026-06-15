@@ -161,6 +161,12 @@
     background: rgba(194, 65, 52, 0.08);
 }
 
+.deal-status--cancelled {
+    color: #7b665c;
+    border-color: rgba(123, 102, 92, 0.24);
+    background: rgba(123, 102, 92, 0.08);
+}
+
 .deals-alert,
 .deals-empty {
     padding: var(--space-5);

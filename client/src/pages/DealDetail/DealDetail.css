@@ -47,9 +47,17 @@
     overflow: hidden;
 }
 
+.deal-product {
+    display: flex;
+    flex-direction: column;
+}
+
 .deal-product__media {
-    aspect-ratio: 16 / 9;
-    min-height: 260px;
+    height: clamp(220px, 30vw, 340px);
+    margin: var(--space-5) var(--space-5) 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
     display: grid;
     place-items: center;
     background:
@@ -61,13 +69,20 @@
 .deal-product__media img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    padding: 10px;
+    display: block;
 }
 
 .deal-product__body,
 .paid-data,
 .deal-chat {
     padding: var(--space-5);
+}
+
+.deal-product__body {
+    position: relative;
+    background: #ffffff;
 }
 
 .deal-product__top {
@@ -91,11 +106,13 @@
 .deal-product__desc {
     margin-top: var(--space-4);
     color: var(--color-text-muted);
+    line-height: 1.5;
+    word-break: break-word;
 }
 
 .deal-facts {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: var(--space-3);
     margin-top: var(--space-5);
 }
@@ -124,8 +141,44 @@
     font-size: 13px;
 }
 
+.payment-summary,
 .paid-data {
     border-top: 1px solid var(--color-border);
+}
+
+.payment-summary {
+    padding: var(--space-5);
+}
+
+.payment-summary__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+
+.payment-summary__grid div {
+    min-width: 0;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    background: #f5f7f4;
+}
+
+.payment-summary__grid span,
+.payment-summary__grid strong {
+    display: block;
+}
+
+.payment-summary__grid span {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.payment-summary__grid strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 2px;
+    font-size: 13px;
 }
 
 .deal-section-head {
@@ -254,12 +307,21 @@
     background: rgba(22, 120, 106, 0.08);
 }
 
-.confirm-box strong {
+.refund-box {
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(198, 93, 53, 0.22);
+    background: rgba(198, 93, 53, 0.08);
+}
+
+.confirm-box strong,
+.refund-box strong {
     display: block;
     margin-bottom: 6px;
 }
 
-.confirm-box p {
+.confirm-box p,
+.refund-box p {
     margin-bottom: var(--space-3);
     color: var(--color-text-muted);
 }
@@ -430,6 +492,12 @@
     background: rgba(194, 65, 52, 0.08);
 }
 
+.deal-status--cancelled {
+    color: #7b665c;
+    border-color: rgba(123, 102, 92, 0.24);
+    background: rgba(123, 102, 92, 0.08);
+}
+
 @media (max-width: 980px) {
     .deal-layout {
         grid-template-columns: 1fr;
@@ -449,6 +517,10 @@
     }
 
     .deal-facts {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-summary__grid {
         grid-template-columns: 1fr;
     }
 

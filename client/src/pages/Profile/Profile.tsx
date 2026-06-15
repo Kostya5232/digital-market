@@ -18,7 +18,7 @@ type MyItem = {
     updatedAt?: string;
 };
 
-type DealStatus = "PAID" | "COMPLETED" | "DISPUTED";
+type DealStatus = "PAID" | "COMPLETED" | "DISPUTED" | "CANCELLED";
 
 type Order = {
     id: string;
@@ -47,6 +47,7 @@ function initials(username: string) {
 function dealStatusLabel(status: DealStatus | undefined, lang: "ru" | "en") {
     if (status === "COMPLETED") return lang === "ru" ? "Завершена" : "Completed";
     if (status === "DISPUTED") return lang === "ru" ? "Спор" : "Dispute";
+    if (status === "CANCELLED") return lang === "ru" ? "Отменена" : "Cancelled";
     return lang === "ru" ? "В процессе" : "In progress";
 }
 

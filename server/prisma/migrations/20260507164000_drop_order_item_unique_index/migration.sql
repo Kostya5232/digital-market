@@ -1,0 +1,2 @@
+ALTER TABLE "Order" DROP CONSTRAINT IF EXISTS "Order_itemId_key";
+DROP INDEX IF EXISTS "Order_itemId_key";

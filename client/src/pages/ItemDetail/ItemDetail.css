@@ -45,7 +45,10 @@
     background:
         linear-gradient(135deg, rgba(22, 120, 106, 0.1), rgba(198, 93, 53, 0.1)),
         #eef3ef;
-    min-height: 420px;
+    aspect-ratio: 16 / 10;
+    min-height: 320px;
+    max-height: 560px;
+    padding: var(--space-3);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,8 +57,9 @@
 .product__img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
     display: block;
+    border-radius: var(--radius-lg);
 }
 
 .product__placeholder {
@@ -146,6 +150,166 @@
     flex-wrap: wrap;
 }
 
+.checkout-panel {
+    display: grid;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    border: 1px solid rgba(22, 120, 106, 0.18);
+    border-radius: var(--radius-lg);
+    background: #f5f7f4;
+}
+
+.checkout-panel__head,
+.checkout-panel__summary {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.checkout-panel__head h3 {
+    margin: 0;
+    font-size: 16px;
+    letter-spacing: 0;
+}
+
+.checkout-panel__head p {
+    margin: 6px 0 0;
+    color: var(--color-text-muted);
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+.checkout-panel__head span,
+.checkout-panel__summary span {
+    color: var(--color-text-muted);
+    font-size: 13px;
+    white-space: nowrap;
+}
+
+.payment-options {
+    display: grid;
+    gap: 8px;
+}
+
+.payment-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    color: var(--color-text);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+}
+
+.payment-option:hover:not(:disabled),
+.payment-option--active {
+    border-color: rgba(22, 120, 106, 0.34);
+    background: rgba(22, 120, 106, 0.07);
+    box-shadow: var(--shadow-sm);
+}
+
+.payment-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.58;
+}
+
+.payment-option__icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 900;
+    position: relative;
+    overflow: hidden;
+}
+
+.payment-option__icon--wallet {
+    background: linear-gradient(135deg, #16895d, #23a679);
+}
+
+.payment-option__icon--card {
+    background: linear-gradient(135deg, #247ac8, #53a3e8);
+}
+
+.payment-option__icon--card::before {
+    content: "";
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 11px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+.payment-option__icon--card::after {
+    content: "";
+    position: absolute;
+    left: 9px;
+    bottom: 10px;
+    width: 11px;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.payment-option__icon--sbp {
+    background: #ffffff;
+}
+
+.payment-option__icon--sbp::before,
+.payment-option__icon--sbp::after {
+    content: "";
+    position: absolute;
+    inset: 7px 8px;
+    clip-path: polygon(0 0, 100% 50%, 0 100%, 30% 50%);
+}
+
+.payment-option__icon--sbp::before {
+    background: linear-gradient(180deg, #2f80ed 0 33%, #20b46b 33% 66%, #f15a24 66%);
+    transform: translateX(-2px);
+}
+
+.payment-option__icon--sbp::after {
+    background: linear-gradient(180deg, #9c27b0 0 33%, #20b46b 33% 66%, #f2c94c 66%);
+    transform: translateX(6px) scale(0.76);
+}
+
+.payment-option__text {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+}
+
+.payment-option__text strong {
+    font-size: 14px;
+}
+
+.payment-option__text span {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.checkout-panel__summary {
+    align-items: center;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+}
+
+.checkout-panel__summary strong {
+    font-size: 18px;
+}
+
 .alert {
     padding: 12px 14px;
     border-radius: var(--radius-lg);
@@ -195,4 +359,12 @@
 .dangerBtn:hover {
     background: rgba(194, 65, 52, 0.16) !important;
     border-color: rgba(194, 65, 52, 0.34) !important;
+}
+
+@media (max-width: 640px) {
+    .checkout-panel__head,
+    .checkout-panel__summary {
+        align-items: stretch;
+        flex-direction: column;
+    }
 }

@@ -50,7 +50,7 @@
 }
 
 .brand::before {
-    content: "LH";
+    content: "ЛХ";
     display: inline-grid;
     place-items: center;
     width: 34px;
@@ -78,7 +78,10 @@
     color: var(--color-text-muted);
     border: 1px solid transparent;
     font-size: 14px;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
 }
 
 .navlink:hover {

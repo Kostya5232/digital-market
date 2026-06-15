@@ -11,6 +11,7 @@ type DealTab = "purchases" | "sales";
 function statusText(status: DealStatus, t: ReturnType<typeof useSettings>["t"]) {
     if (status === "COMPLETED") return t("completedDeal");
     if (status === "DISPUTED") return t("disputedDeal");
+    if (status === "CANCELLED") return t("cancelledDeal");
     return t("awaitingConfirm");
 }
 

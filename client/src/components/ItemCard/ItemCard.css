@@ -21,6 +21,7 @@
 .itemcard__media {
     aspect-ratio: 16 / 10;
     min-height: 160px;
+    padding: 10px;
     background:
         linear-gradient(135deg, rgba(22, 120, 106, 0.1), rgba(198, 93, 53, 0.1)),
         #eef3ef;
@@ -29,12 +30,14 @@
     align-items: center;
     justify-content: center;
     color: inherit;
+    overflow: hidden;
 }
 
 .itemcard__img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    border-radius: var(--radius-md);
 }
 
 .itemcard__placeholder {
@@ -55,6 +58,7 @@
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--space-3);
+    min-width: 0;
 }
 
 .itemcard__badge {
@@ -121,6 +125,7 @@
     font-weight: 700;
     white-space: nowrap;
     color: var(--color-text);
+    flex: 0 0 auto;
 }
 
 .itemcard__desc {

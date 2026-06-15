@@ -5,10 +5,13 @@ import {
     createDealReview,
     getDeal,
     openDealDispute,
+    refundDeal,
     sendDealMessage,
     updateDealDelivery,
     type Deal,
     type DealStatus,
+    type PaymentMethod,
+    type PaymentStatus,
 } from "../../api/orders";
 import { API_URL } from "../../api/auth";
 import Button from "../../components/ui/Button/Button";
@@ -20,7 +23,24 @@ import "./DealDetail.css";
 function statusText(status: DealStatus, t: ReturnType<typeof useSettings>["t"]) {
     if (status === "COMPLETED") return t("completedDeal");
     if (status === "DISPUTED") return t("disputedDeal");
+    if (status === "CANCELLED") return t("cancelledDeal");
     return t("awaitingConfirm");
+}
+
+function paymentMethodLabel(method: PaymentMethod | undefined, lang: "ru" | "en") {
+    if (method === "CARD") return lang === "ru" ? "Банковская карта RU" : "Bank card";
+    if (method === "SBP") return lang === "ru" ? "СБП (QR)" : "SBP (QR)";
+    if (method === "BALANCE") return lang === "ru" ? "Баланс сайта" : "Site balance";
+    return lang === "ru" ? "Не указан" : "Not specified";
+}
+
+function paymentStatusLabel(status: PaymentStatus | undefined, lang: "ru" | "en") {
+    if (status === "RELEASED") return lang === "ru" ? "Переведён продавцу" : "Released to seller";
+    if (status === "REFUNDED") return lang === "ru" ? "Возвращён на баланс" : "Refunded to balance";
+    if (status === "FAILED") return lang === "ru" ? "Ошибка оплаты" : "Payment failed";
+    if (status === "PENDING") return lang === "ru" ? "Ожидает оплаты" : "Pending";
+    if (status === "PAID") return lang === "ru" ? "Зарезервирован" : "Reserved";
+    return lang === "ru" ? "Не указан" : "Not specified";
 }
 
 function Stars({ value }: { value: number }) {
@@ -84,6 +104,9 @@ export default function DealDetail() {
 
     const isBuyer = Boolean(user && deal && deal.buyerId === user.id);
     const isSeller = Boolean(user && deal && deal.sellerId === user.id);
+    const isActiveDeal = Boolean(deal && deal.status !== "COMPLETED" && deal.status !== "CANCELLED");
+    const refundNeedsDispute = Boolean(deal?.deliveryData && deal.status !== "DISPUTED");
+    const refundToBalance = deal?.payment?.method === "BALANCE" || !deal?.payment;
 
     const imgSrc = useMemo(() => {
         if (!deal?.item.hasImage) return null;
@@ -158,6 +181,36 @@ export default function DealDetail() {
             setDeal(updated);
         } catch {
             setError(lang === "ru" ? "Не удалось открыть спор." : "Failed to open dispute.");
+        } finally {
+            setBusy(false);
+        }
+    }
+
+    async function requestRefund() {
+        if (!token || !deal) return;
+        const ok = window.confirm(
+            refundToBalance
+                ? lang === "ru"
+                    ? "Отменить сделку и вернуть деньги на баланс? Товар снова станет доступен в каталоге."
+                    : "Cancel the deal and refund the money to your balance? The item will return to the catalog."
+                : lang === "ru"
+                  ? "Отменить внешний платеж? В демо-режиме внутренний баланс не будет увеличен."
+                  : "Cancel the external payment? In demo mode the internal balance will not increase."
+        );
+        if (!ok) return;
+
+        try {
+            setBusy(true);
+            setError(null);
+            const updated = await refundDeal(token, deal.id);
+            setDeal(updated);
+            await refreshMe();
+        } catch {
+            setError(
+                lang === "ru"
+                    ? "Не удалось оформить возврат. Если продавец уже выдал данные, сначала откройте спор."
+                    : "Failed to refund. If delivery data was already provided, open a dispute first."
+            );
         } finally {
             setBusy(false);
         }
@@ -260,13 +313,38 @@ export default function DealDetail() {
                                 <span>{lang === "ru" ? "Создана" : "Created"}</span>
                                 <strong>{new Date(deal.createdAt).toLocaleDateString(lang === "ru" ? "ru-RU" : "en-US")}</strong>
                             </div>
+                            <div>
+                                <span>{lang === "ru" ? "Оплата" : "Payment"}</span>
+                                <strong>{paymentMethodLabel(deal.payment?.method, lang)}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="payment-summary">
+                        <div className="deal-section-head">
+                            <h2>{lang === "ru" ? "Платёж" : "Payment"}</h2>
+                            <span>{paymentStatusLabel(deal.payment?.status, lang)}</span>
+                        </div>
+                        <div className="payment-summary__grid">
+                            <div>
+                                <span>{lang === "ru" ? "Сумма" : "Amount"}</span>
+                                <strong>{formatMoney(deal.payment?.amount ?? deal.price)}</strong>
+                            </div>
+                            <div>
+                                <span>{lang === "ru" ? "Метод" : "Method"}</span>
+                                <strong>{paymentMethodLabel(deal.payment?.method, lang)}</strong>
+                            </div>
+                            <div>
+                                <span>{lang === "ru" ? "Провайдер" : "Provider"}</span>
+                                <strong>{deal.payment?.provider ?? (lang === "ru" ? "Старый заказ" : "Legacy deal")}</strong>
+                            </div>
                         </div>
                     </div>
 
                     <div className="paid-data">
                         <div className="deal-section-head">
                             <h2>{t("paidData")}</h2>
-                            {isSeller && deal.status !== "COMPLETED" && <span>{t("deliveryData")}</span>}
+                            {isSeller && isActiveDeal && <span>{t("deliveryData")}</span>}
                         </div>
 
                         {deal.deliveryData ? (
@@ -275,7 +353,7 @@ export default function DealDetail() {
                             <p className="paid-data__empty">{isSeller ? t("deliveryPlaceholder") : t("waitingDelivery")}</p>
                         )}
 
-                        {isSeller && deal.status !== "COMPLETED" && (
+                        {isSeller && isActiveDeal && (
                             <div className="delivery-editor">
                                 <textarea value={deliveryDraft} onChange={(e) => setDeliveryDraft(e.target.value)} placeholder={t("deliveryPlaceholder")} />
                                 <Button onClick={saveDelivery} disabled={busy || !deliveryDraft.trim()}>
@@ -289,7 +367,7 @@ export default function DealDetail() {
                 <aside className="deal-chat">
                     <div className="deal-section-head">
                         <h2>{t("chat")}</h2>
-                        {deal.status !== "COMPLETED" && (
+                        {isActiveDeal && (
                             <Button variant="ghost" onClick={disputeDeal} disabled={busy || deal.status === "DISPUTED"}>
                                 {t("openDispute")}
                             </Button>
@@ -310,7 +388,7 @@ export default function DealDetail() {
                             </div>
                         ))}
 
-                        {isBuyer && deal.status !== "COMPLETED" && (
+                        {isBuyer && isActiveDeal && (
                             <div className="confirm-box">
                                 <strong>{t("confirmReceipt")}</strong>
                                 <p>
@@ -322,6 +400,28 @@ export default function DealDetail() {
                                 </p>
                                 <Button onClick={confirmReceipt} disabled={busy || !deal.deliveryData}>
                                     {t("confirmReceipt")}
+                                </Button>
+                            </div>
+                        )}
+
+                        {isBuyer && isActiveDeal && (
+                            <div className="refund-box">
+                                <strong>{lang === "ru" ? "Отмена и возврат" : "Cancel and refund"}</strong>
+                                <p>
+                                    {refundNeedsDispute
+                                        ? lang === "ru"
+                                            ? "Продавец уже выдал данные. Для возврата сначала откройте спор."
+                                            : "The seller has already provided data. Open a dispute before refunding."
+                                        : refundToBalance
+                                        ? lang === "ru"
+                                            ? "Если товар не был получен, можно отменить сделку. Деньги вернутся на баланс сайта."
+                                            : "If the item was not received, cancel the deal. Funds will return to your site balance."
+                                        : lang === "ru"
+                                          ? "При оплате картой или СБП внешний платеж отменяется отдельно, внутренний баланс не увеличивается."
+                                          : "For card or SBP payments, the external payment is cancelled separately and the internal balance does not increase."}
+                                </p>
+                                <Button variant="secondary" onClick={requestRefund} disabled={busy || refundNeedsDispute}>
+                                    {refundToBalance ? (lang === "ru" ? "Вернуть на баланс" : "Refund to balance") : lang === "ru" ? "Отменить платеж" : "Cancel payment"}
                                 </Button>
                             </div>
                         )}
